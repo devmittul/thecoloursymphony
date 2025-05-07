@@ -509,6 +509,55 @@
                 grid-template-columns: repeat(3, 1fr);
             }
         }
+        
+        .publish-container {
+            margin: 10px 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .publish-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+            flex: 1;
+            justify-content: center;
+            min-width: 200px;
+        }
+        
+        .publish-btn:hover {
+            background-color: #218838;
+        }
+        
+        .remove-samples-btn {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+            flex: 1;
+            justify-content: center;
+            min-width: 200px;
+        }
+        
+        .remove-samples-btn:hover {
+            background-color: #f5c6cb;
+        }
     </style>
 </head>
 <body>
@@ -556,6 +605,16 @@
                     <button class="filter-btn active" data-filter="all">All</button>
                     <button class="filter-btn" data-filter="featured">Featured</button>
                     <button class="filter-btn" data-filter="recent">Recent</button>
+                </div>
+                
+                <!-- Publish Changes button -->
+                <div class="publish-container">
+                    <button id="publishChangesBtn" class="publish-btn">
+                        <i class="fas fa-globe"></i> Publish Changes to Website
+                    </button>
+                    <button id="removeSamplesBtn" class="remove-samples-btn">
+                        <i class="fas fa-trash-alt"></i> Remove Sample Artworks
+                    </button>
                 </div>
                 
                 <!-- Artwork grid -->
@@ -860,6 +919,58 @@
             modal.classList.remove('active');
         }
         
+        // Function to publish changes to the main website
+        function publishChangesToWebsite() {
+            // Set timestamp for update
+            localStorage.setItem('artworksLastUpdated', Date.now().toString());
+            
+            // Force refresh artwork display on main website by setting a specific flag
+            localStorage.setItem('forceRefreshArtworks', 'true');
+            
+            // Dispatch custom event for listeners
+            if (typeof window.parent !== 'undefined') {
+                const event = new CustomEvent('artworksUpdated');
+                window.parent.document.dispatchEvent(event);
+            }
+            
+            // Show success message
+            showToast('Changes published to website successfully!', 'success');
+        }
+        
+        // Function to remove sample artworks
+        function removeSampleArtworks() {
+            // Show confirmation before proceeding
+            if (!confirm('Are you sure you want to remove all sample artworks? This cannot be undone.')) {
+                return;
+            }
+            
+            // Find all sample artworks (typically they have descriptions containing "sample")
+            const originalCount = artworks.length;
+            artworks = artworks.filter(artwork => {
+                const isSample = artwork.description.toLowerCase().includes('sample') || 
+                                artwork.title.toLowerCase().includes('sample') ||
+                                artwork.images.some(img => img.path.includes('painting1.jpg') || img.path.includes('painting2.jpg'));
+                return !isSample;
+            });
+            
+            const removedCount = originalCount - artworks.length;
+            
+            // Update localStorage with filtered artworks
+            localStorage.setItem('artworks', JSON.stringify(artworks));
+            
+            // Set timestamp for update
+            localStorage.setItem('artworksLastUpdated', Date.now().toString());
+            
+            // Update filtered artworks for display
+            filteredArtworks = [...artworks];
+            
+            // Re-render artworks
+            renderArtworks(filteredArtworks);
+            
+            // Show success message
+            showToast(`${removedCount} sample artwork(s) removed successfully!`, 'success');
+        }
+        
         // Setup event listeners
         function setupEventListeners() {
             // Modal close button
@@ -878,6 +989,12 @@
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', handleFilterClick);
             });
+            
+            // Publish Changes button
+            document.getElementById('publishChangesBtn').addEventListener('click', publishChangesToWebsite);
+            
+            // Remove Sample Artworks button
+            document.getElementById('removeSamplesBtn').addEventListener('click', removeSampleArtworks);
         }
         
         // Handle search

@@ -304,19 +304,30 @@ function loadAndDisplayArtworks() {
 function checkForArtworkUpdates() {
     const lastLoadTime = localStorage.getItem('lastArtworkLoadTime') || 0;
     const lastUpdateTime = localStorage.getItem('artworksLastUpdated') || 0;
+    const forceRefresh = localStorage.getItem('forceRefreshArtworks') === 'true';
     
-    // If the artworks were updated after the last load time, reload them
-    if (parseInt(lastUpdateTime) > parseInt(lastLoadTime)) {
+    // If the artworks were updated after the last load time or force refresh is set, reload them
+    if (parseInt(lastUpdateTime) > parseInt(lastLoadTime) || forceRefresh) {
         console.log('Artwork updates detected, reloading gallery');
         loadAndDisplayArtworks();
+        
+        // Clear the force refresh flag after processing
+        if (forceRefresh) {
+            localStorage.removeItem('forceRefreshArtworks');
+        }
     }
 }
 
 // Listen for storage events to detect changes from admin panel
 window.addEventListener('storage', (event) => {
-    if (event.key === 'artworks') {
-        console.log('Artworks updated in localStorage, reloading gallery');
+    if (event.key === 'artworks' || event.key === 'forceRefreshArtworks') {
+        console.log(`Storage event detected for key: ${event.key}, reloading gallery`);
         loadAndDisplayArtworks();
+        
+        // Clear the force refresh flag if it was set
+        if (localStorage.getItem('forceRefreshArtworks') === 'true') {
+            localStorage.removeItem('forceRefreshArtworks');
+        }
     }
 });
 

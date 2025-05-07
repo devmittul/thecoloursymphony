@@ -352,6 +352,30 @@
                 min-width: 150px;
             }
         }
+        
+        /* Publication notice */
+        .publish-notice {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            background-color: #e2f4fd;
+            border-left: 4px solid #17a2b8;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .publish-notice i {
+            color: #17a2b8;
+            font-size: 1.2rem;
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+        
+        .publish-notice p {
+            margin: 0;
+            color: #333;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -393,6 +417,12 @@
                     <div class="admin-form-group">
                         <label for="artworkTitle">Artwork Title</label>
                         <input type="text" id="artworkTitle" name="title" required>
+                    </div>
+                    
+                    <!-- Publication notice -->
+                    <div class="publish-notice">
+                        <i class="fas fa-info-circle"></i>
+                        <p>After adding or editing artwork, remember to use the <strong>Publish Changes</strong> button on the Manage Artworks page to make your changes visible on the main website.</p>
                     </div>
                     
                     <div class="admin-form-group">
