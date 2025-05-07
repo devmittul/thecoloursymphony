@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Form Submission - The Color Symphony</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .debug-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #8d7b68;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 300px;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #28a745;
+            background-color: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #8d7b68;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #7c6a59;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #8d7b68;
+            text-decoration: none;
+        }
+        .back-btn i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <a href="manage-artworks.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Manage Artworks</a>
+    <h1>Artwork Form Debugging Tool</h1>
+    <p>This tool helps diagnose issues with the artwork form submission process.</p>
+    
+    <div class="debug-section">
+        <h2>1. Check LocalStorage</h2>
+        <button id="checkLocalStorage">Show Artwork Data</button>
+        <button id="clearLocalStorage">Clear Artwork Data</button>
+        <div id="localStorageData"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>2. Manual Form Validation</h2>
+        <form id="debugForm">
+            <div>
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" value="Debug Artwork">
+            </div>
+            <div>
+                <label for="medium">Medium:</label>
+                <input type="text" id="medium" name="medium" value="Debug Medium">
+            </div>
+            <div>
+                <label for="year">Year:</label>
+                <input type="text" id="year" name="year" value="2025">
+            </div>
+            <div>
+                <label for="description">Description:</label>
+                <textarea id="description" name="description">Debug description</textarea>
+            </div>
+            <div>
+                <label for="image">Image Path:</label>
+                <input type="text" id="image" name="image" value="../images/debug.jpg">
+            </div>
+            <button type="submit">Test Form Save</button>
+        </form>
+        <div id="formValidationResult"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>3. Create Sample Entry</h2>
+        <button id="createSampleEntry">Create Sample Artwork</button>
+        <div id="sampleEntryResult"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>4. Firebase Storage Test</h2>
+        <p>Check if Firebase Storage is properly initialized:</p>
+        <button id="checkFirebase">Check Firebase</button>
+        <div id="firebaseResult"></div>
+    </div>
+    
+    <script>
+        // Check LocalStorage
+        document.getElementById('checkLocalStorage').addEventListener('click', function() {
+            const resultDiv = document.getElementById('localStorageData');
+            try {
+                const artworks = JSON.parse(localStorage.getItem('artworks') || '[]');
+                resultDiv.innerHTML = `
+                    <p>Found ${artworks.length} artworks in localStorage.</p>
+                    <pre>${JSON.stringify(artworks, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        });
+        
+        // Clear LocalStorage
+        document.getElementById('clearLocalStorage').addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all artwork data? This cannot be undone.')) {
+                localStorage.removeItem('artworks');
+                localStorage.removeItem('artworksCache');
+                localStorage.removeItem('artworksCacheTimestamp');
+                localStorage.setItem('artworksLastUpdated', Date.now().toString());
+                localStorage.setItem('artworksNeedPublishing', 'true');
+                
+                document.getElementById('localStorageData').innerHTML = 
+                    `<div class="success">Artwork data cleared successfully!</div>`;
+            }
+        });
+        
+        // Test Form Validation
+        document.getElementById('debugForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const resultDiv = document.getElementById('formValidationResult');
+            
+            const title = document.getElementById('title').value;
+            const medium = document.getElementById('medium').value;
+            const year = document.getElementById('year').value;
+            const description = document.getElementById('description').value;
+            const image = document.getElementById('image').value;
+            
+            let valid = true;
+            let errorMessages = [];
+            
+            if (!title) {
+                valid = false;
+                errorMessages.push('Title is required');
+            }
+            
+            if (!medium) {
+                valid = false;
+                errorMessages.push('Medium is required');
+            }
+            
+            if (!year) {
+                valid = false;
+                errorMessages.push('Year is required');
+            }
+            
+            if (!description) {
+                valid = false;
+                errorMessages.push('Description is required');
+            }
+            
+            if (!image) {
+                valid = false;
+                errorMessages.push('Image is required');
+            }
+            
+            if (valid) {
+                // Create the artwork object
+                const artwork = {
+                    id: Date.now(),
+                    title,
+                    artist: "Debug User",
+                    medium,
+                    year,
+                    description,
+                    dateAdded: new Date().toISOString().split('T')[0],
+                    featured: false,
+                    images: [
+                        { path: image, isPrimary: true }
+                    ]
+                };
+                
+                // Save to localStorage
+                try {
+                    let artworks = JSON.parse(localStorage.getItem('artworks') || '[]');
+                    artworks.push(artwork);
+                    localStorage.setItem('artworks', JSON.stringify(artworks));
+                    localStorage.setItem('artworksLastUpdated', Date.now().toString());
+                    localStorage.setItem('artworksNeedPublishing', 'true');
+                    
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <p>Form is valid! Artwork saved to localStorage.</p>
+                            <p>ID: ${artwork.id}</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <p>Error saving to localStorage: ${error.message}</p>
+                        </div>
+                    `;
+                }
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <p>Form validation failed:</p>
+                        <ul>${errorMessages.map(msg => `<li>${msg}</li>`).join('')}</ul>
+                    </div>
+                `;
+            }
+        });
+        
+        // Create Sample Entry
+        document.getElementById('createSampleEntry').addEventListener('click', function() {
+            const resultDiv = document.getElementById('sampleEntryResult');
+            
+            // Create a sample artwork
+            const sampleArtwork = {
+                id: Date.now(),
+                title: "Debug Test Artwork",
+                artist: "Debug Artist",
+                year: "2025",
+                medium: "Digital",
+                dimensions: "800 x 600 pixels",
+                description: "This is a test artwork created from the debug utility.",
+                price: 0,
+                currency: "USD",
+                inventory: {
+                    originals: 1,
+                    prints: 0,
+                    available: true
+                },
+                categories: [],
+                materials: [],
+                featured: false,
+                images: [
+                    { path: "../images/debug_test.jpg", isPrimary: true }
+                ],
+                has360View: false,
+                dateAdded: new Date().toISOString().split('T')[0]
+            };
+            
+            try {
+                // Get existing artworks
+                let artworks = [];
+                const storedArtworks = localStorage.getItem('artworks');
+                
+                if (storedArtworks) {
+                    artworks = JSON.parse(storedArtworks);
+                }
+                
+                // Add the sample artwork
+                artworks.push(sampleArtwork);
+                
+                // Save to localStorage
+                localStorage.setItem('artworks', JSON.stringify(artworks));
+                localStorage.setItem('artworksLastUpdated', Date.now().toString());
+                localStorage.setItem('artworksNeedPublishing', 'true');
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <p>Sample artwork created successfully!</p>
+                        <p>New total: ${artworks.length} artworks</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <p>Error creating sample artwork: ${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+        
+        // Check Firebase
+        document.getElementById('checkFirebase').addEventListener('click', function() {
+            const resultDiv = document.getElementById('firebaseResult');
+            
+            try {
+                // Check if Firebase is defined
+                if (typeof firebase === 'undefined') {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <p>Firebase is not loaded on this page.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Check if Storage is initialized
+                if (firebase.storage) {
+                    const storageRef = firebase.storage().ref();
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <p>Firebase Storage is initialized properly.</p>
+                            <p>Storage bucket: ${firebase.storage().ref().bucket}</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <p>Firebase is loaded but Storage is not initialized.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <p>Error checking Firebase: ${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html> 
