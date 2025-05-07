@@ -406,6 +406,30 @@ function setupArtworkForm() {
                 artworks = JSON.parse(storedArtworks);
             }
             
+            // Display image upload information
+            const imageInfoElement = document.createElement('div');
+            imageInfoElement.className = 'image-upload-info';
+            imageInfoElement.innerHTML = `
+                <h3><i class="fas fa-info-circle"></i> Image Upload Information</h3>
+                <p>Your artwork metadata has been saved, but there are additional steps needed for the image:</p>
+                <ol>
+                    <li><strong>Current image path:</strong> ${formData.image}</li>
+                    <li>Remember that images are NOT automatically uploaded to GitHub</li>
+                    <li>You need to manually copy your image file to the "images" folder in your project</li>
+                    <li>When exporting to GitHub, only the image path is stored, not the actual image file</li>
+                </ol>
+                <p>To fully deploy your artwork:</p>
+                <ol>
+                    <li>Save your image to the "images" folder</li>
+                    <li>Use the "Export Data for GitHub" button on the Manage Artworks page</li>
+                    <li>Upload both the JSON data and your image files to GitHub</li>
+                </ol>
+            `;
+            
+            // Insert after the form
+            const formParent = artworkForm.parentNode;
+            formParent.insertBefore(imageInfoElement, artworkForm.nextSibling);
+            
             // Format for storage
             const newArtwork = {
                 id: formData.id,
@@ -457,7 +481,7 @@ function setupArtworkForm() {
             }
             
             // Show success message
-            showAlert('Artwork saved successfully! Remember to publish your changes.', 'success');
+            showAlert('Artwork saved successfully! Remember to publish your changes and upload your image files.', 'success');
             
             // Reset form and UI
             artworkForm.reset();
@@ -472,6 +496,13 @@ function setupArtworkForm() {
             
             // Scroll to top
             window.scrollTo(0, 0);
+            
+            // Remove the image upload info after 60 seconds
+            setTimeout(() => {
+                if (imageInfoElement && imageInfoElement.parentNode) {
+                    imageInfoElement.parentNode.removeChild(imageInfoElement);
+                }
+            }, 60000);
         };
         
         // If we're using Firebase and have an image to upload
@@ -574,4 +605,44 @@ function loadArtworks() {
 // Alias for showAlert
 function showNotification(message, type = 'info') {
     showAlert(message, type);
-} 
+}
+
+// Add this CSS to style the image upload info box
+const imageUploadInfoStyles = document.createElement('style');
+imageUploadInfoStyles.textContent = `
+    .image-upload-info {
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        border-radius: 4px;
+    }
+    
+    .image-upload-info h3 {
+        margin-top: 0;
+        color: #856404;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .image-upload-info p {
+        margin: 10px 0;
+        color: #333;
+    }
+    
+    .image-upload-info ol {
+        margin: 10px 0;
+        padding-left: 20px;
+    }
+    
+    .image-upload-info li {
+        margin-bottom: 5px;
+    }
+    
+    .image-upload-info strong {
+        font-weight: 500;
+    }
+`;
+document.head.appendChild(imageUploadInfoStyles); 

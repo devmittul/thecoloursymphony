@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload Guide - The Color Symphony</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+    <style>
+        .guide-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .guide-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .guide-section h2 {
+            color: #8d7b68;
+            margin-top: 0;
+            border-bottom: 2px solid #f5f1eb;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background-color: #8d7b68;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .note {
+            background-color: #f5f1eb;
+            padding: 15px;
+            border-left: 4px solid #8d7b68;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .note h4 {
+            margin-top: 0;
+            color: #8d7b68;
+        }
+        
+        .note p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .image-flow {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-flow-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #8d7b68;
+        }
+        
+        .flow-diagram {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 0 auto;
+            max-width: 700px;
+        }
+        
+        .flow-step {
+            text-align: center;
+            width: 140px;
+            z-index: 1;
+        }
+        
+        .flow-icon {
+            width: 70px;
+            height: 70px;
+            background-color: #8d7b68;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 24px;
+        }
+        
+        .flow-text {
+            font-size: 0.9rem;
+        }
+        
+        .flow-arrow {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 35px;
+            height: 3px;
+            background-color: #ddd;
+            z-index: 0;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #8d7b68;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: background-color 0.2s;
+        }
+        
+        .back-btn:hover {
+            background-color: #7c6b59;
+        }
+        
+        code {
+            background: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #e83e8c;
+        }
+        
+        .image-example {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        
+        .image-path-example {
+            font-family: monospace;
+            display: block;
+            margin: 10px 0;
+            padding: 8px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>The Color Symphony</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="manage-artworks.html"><i class="fas fa-arrow-left"></i> Back to Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="guide-container">
+        <a href="manage-artworks.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Manage Artworks</a>
+        
+        <div class="guide-section">
+            <h2><i class="fas fa-info-circle"></i> Image Upload Guide</h2>
+            <p>This guide explains how images work with your GitHub-based art website. Understanding this will help you properly manage your artwork images.</p>
+            
+            <div class="image-flow">
+                <h3 class="image-flow-title">How Images Flow in Your System</h3>
+                <div class="flow-diagram">
+                    <div class="flow-arrow"></div>
+                    <div class="flow-step">
+                        <div class="flow-icon"><i class="fas fa-upload"></i></div>
+                        <div class="flow-text">1. Upload in Admin Panel</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon"><i class="fas fa-folder"></i></div>
+                        <div class="flow-text">2. Save to /images folder</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon"><i class="fab fa-github"></i></div>
+                        <div class="flow-text">3. Push to GitHub</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon"><i class="fas fa-globe"></i></div>
+                        <div class="flow-text">4. Display on Website</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="guide-section">
+            <h2><i class="fas fa-question-circle"></i> Why GitHub Doesn't Store Your Images Automatically</h2>
+            <p>When you upload an image through the admin panel, the image data is only stored <strong>temporarily</strong> in your browser. Our system is designed this way because:</p>
+            <ul>
+                <li>GitHub is primarily for code, not large media files</li>
+                <li>Automatic image uploads would require server-side code</li>
+                <li>This approach gives you more control over your image assets</li>
+            </ul>
+            
+            <div class="note">
+                <h4>Important to Understand:</h4>
+                <p>Only the <strong>metadata</strong> about your artwork (title, description, image path, etc.) is stored in the GitHub JSON database. The actual image files must be manually placed in your images folder and pushed to GitHub.</p>
+            </div>
+        </div>
+        
+        <div class="guide-section">
+            <h2><i class="fas fa-list-ol"></i> Step-by-Step Process</h2>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Upload Image in Admin Panel</h3>
+                    <p>When you upload an image in the "Add Artwork" form, the system processes it and shows you a preview.</p>
+                    <p>The system will create a path for the image like: <code>images/your_filename.jpg</code></p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Save the Image File to Your Computer</h3>
+                    <p>If you're using drag and drop, your original image is still on your computer. You need to:</p>
+                    <ol>
+                        <li>Create a copy of that image</li>
+                        <li>Name it exactly as shown in the admin panel</li>
+                        <li>Place it in the <code>/images</code> folder of your project</li>
+                    </ol>
+                    
+                    <div class="image-example">
+                        <p><strong>Example:</strong> If your artwork form shows:</p>
+                        <span class="image-path-example">images/sunset_painting.jpg</span>
+                        <p>You must save your image as "sunset_painting.jpg" in the images folder.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Export the Artwork Data</h3>
+                    <p>On the "Manage Artworks" page, click the "Export Data for GitHub" button.</p>
+                    <p>This will generate a JSON file that contains all of your artwork information.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Upload Both to GitHub</h3>
+                    <p>You need to upload <strong>both</strong> to your GitHub repository:</p>
+                    <ol>
+                        <li>The <code>artworks.json</code> file (to the <code>data</code> folder)</li>
+                        <li>Your image files (to the <code>images</code> folder)</li>
+                    </ol>
+                    <p>You can do this through the GitHub website or using Git commands.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="guide-section">
+            <h2><i class="fas fa-lightbulb"></i> Tips for Success</h2>
+            <ul>
+                <li><strong>Use consistent file names</strong> - Don't change the image filename after uploading</li>
+                <li><strong>Optimize your images</strong> - Compress images before uploading to keep your site fast</li>
+                <li><strong>Create backups</strong> - Keep copies of your artwork images separately</li>
+                <li><strong>Check paths carefully</strong> - Ensure the paths in your JSON match your actual image files</li>
+            </ul>
+        </div>
+        
+        <div class="guide-section">
+            <h2><i class="fas fa-tools"></i> Advanced: Using Other Image Hosting Options</h2>
+            <p>If you'd prefer not to store images on GitHub, you can use external image hosting services:</p>
+            <ul>
+                <li><strong>Cloudinary</strong> - Offers generous free tier for image hosting</li>
+                <li><strong>Imgur</strong> - Free image hosting with direct links</li>
+                <li><strong>Firebase Storage</strong> - Google's cloud storage solution</li>
+            </ul>
+            <p>With these services, just paste the full URL into the image path field instead of a relative path.</p>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-bottom">
+            <p>&copy; 2025 The Color Symphony. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+</html> 
