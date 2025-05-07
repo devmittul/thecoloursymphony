@@ -189,62 +189,109 @@ artworkImages.forEach(img => {
 
 // Load and display artworks from the admin panel
 function loadAndDisplayArtworks() {
-    // Get artworks from localStorage
+    const artworksContainer = document.querySelector('.gallery-container');
+    if (!artworksContainer) return;
+
+    // Load artworks from localStorage
+    let artworks = [];
     const storedArtworks = localStorage.getItem('artworks');
-    if (!storedArtworks) return;
     
-    const artworks = JSON.parse(storedArtworks);
-    
-    // Get only featured artworks for the homepage
-    let featuredArtworks = artworks.filter(artwork => artwork.featured);
-    
-    // Sort by most recent (assuming newer artworks have higher IDs or newer years)
-    featuredArtworks.sort((a, b) => {
-        // First try to sort by year (newer first)
-        if (parseInt(b.year) !== parseInt(a.year)) {
-            return parseInt(b.year) - parseInt(a.year);
+    if (storedArtworks) {
+        try {
+            artworks = JSON.parse(storedArtworks);
+        } catch (error) {
+            console.error("Error parsing artworks:", error);
         }
-        // If years are the same, sort by ID (higher ID is newer)
-        return b.id - a.id;
+    }
+    
+    // Create sample artworks if none exist
+    if (artworks.length === 0) {
+        const sampleArtworks = [
+            {
+                id: 1,
+                title: "Sunrise over Mountains",
+                artist: "Emily Johnson",
+                year: "2022",
+                medium: "Oil on Canvas",
+                dimensions: "24 x 36 inches",
+                description: "A vibrant depiction of sunrise illuminating a mountain range.",
+                featured: true,
+                images: [
+                    { path: "images/painting1.jpg", isPrimary: true }
+                ]
+            },
+            {
+                id: 2,
+                title: "Ocean Waves at Sunset",
+                artist: "Michael Chen",
+                year: "2023",
+                medium: "Acrylic",
+                dimensions: "18 x 24 inches",
+                description: "Powerful ocean waves crashing against rocks at sunset.",
+                featured: false,
+                images: [
+                    { path: "images/painting2.jpg", isPrimary: true }
+                ]
+            }
+        ];
+        
+        // Save sample artworks to localStorage
+        localStorage.setItem('artworks', JSON.stringify(sampleArtworks));
+        artworks = sampleArtworks;
+    }
+    
+    // Clear container first
+    artworksContainer.innerHTML = '';
+    
+    // Sort artworks - featured first, then by date
+    artworks.sort((a, b) => {
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        return 0;
     });
     
-    // Limit to 6 artworks for the homepage
-    featuredArtworks = featuredArtworks.slice(0, 6);
-    
-    // Get the gallery container
-    const galleryContainer = document.querySelector('.gallery-grid');
-    if (!galleryContainer) return;
-    
-    // Clear existing gallery items
-    galleryContainer.innerHTML = '';
-    
-    // Display the artworks
-    featuredArtworks.forEach(artwork => {
-        const galleryCard = document.createElement('div');
-        galleryCard.className = 'gallery-card';
+    // Display artworks
+    artworks.forEach(artwork => {
+        // Create artwork element
+        const artworkElement = document.createElement('div');
+        artworkElement.className = 'gallery-item fade-in';
         
-        galleryCard.innerHTML = `
-            <div class="artwork-image">
-                <img src="${artwork.image}" alt="${artwork.title}">
+        // Get image path, ensuring it works for both admin and main site paths
+        let imagePath = '';
+        if (artwork.images && artwork.images.length > 0) {
+            imagePath = artwork.images[0].path;
+            
+            // Handle paths that might have been set in admin panel
+            if (imagePath.startsWith('../images/')) {
+                imagePath = imagePath.replace('../images/', 'images/');
+            } else if (!imagePath.includes('/')) {
+                imagePath = 'images/' + imagePath;
+            }
+        } else {
+            imagePath = 'images/placeholder.jpg';
+        }
+        
+        // Create HTML content
+        artworkElement.innerHTML = `
+            <div class="gallery-image">
+                <img src="${imagePath}" alt="${artwork.title}" loading="lazy">
             </div>
-            <div class="artwork-details">
+            <div class="gallery-info">
                 <h3>${artwork.title}</h3>
-                <p class="artwork-medium">${artwork.medium}, ${artwork.year}</p>
-                <a href="artwork-details.html?id=${artwork.id}" class="view-btn"><span>View Details</span><i class="fas fa-arrow-right"></i></a>
+                <p>${artwork.medium}, ${artwork.year}</p>
+                <button class="view-details" data-id="${artwork.id}">View Details</button>
             </div>
         `;
         
-        // Add the item to the gallery
-        galleryContainer.appendChild(galleryCard);
+        // Add to container
+        artworksContainer.appendChild(artworkElement);
+        
+        // Add click event for artwork details
+        const viewDetailsBtn = artworkElement.querySelector('.view-details');
+        viewDetailsBtn.addEventListener('click', () => {
+            openArtworkModal(artwork);
+        });
     });
-    
-    // Add animate-on-scroll class to new gallery items
-    document.querySelectorAll('.gallery-card').forEach(el => {
-        el.classList.add('animate-on-scroll');
-    });
-    
-    // Re-run animations
-    animateOnScroll();
 }
 
 // Generate a random review text

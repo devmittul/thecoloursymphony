@@ -575,13 +575,43 @@
             
             // Set image
             if (artwork.images && artwork.images.length > 0) {
-                document.getElementById('artworkImage').value = artwork.images[0].path;
+                let imagePath = artwork.images[0].path;
+                
+                // Store the original path for form submission
+                document.getElementById('artworkImage').value = imagePath;
                 
                 // Preview image if available
                 const imagePreviewContainer = document.getElementById('imagePreviewContainer');
                 if (imagePreviewContainer) {
                     const imagePreview = document.getElementById('imagePreview');
-                    imagePreview.src = artwork.images[0].path;
+                    
+                    // Normalize the image path if it's a sample image
+                    if (imagePath.includes('painting1.jpg') || imagePath.includes('painting2.jpg')) {
+                        // Make sure we have the correct relative path
+                        if (!imagePath.startsWith('../') && !imagePath.startsWith('./')) {
+                            imagePath = '../images/' + imagePath.replace('images/', '').replace('../images/', '');
+                        }
+                    }
+                    
+                    // Set the source and show preview
+                    imagePreview.src = imagePath;
+                    imagePreview.onerror = function() {
+                        // If image fails to load with current path, try alternative path
+                        const altPath = imagePath.startsWith('../') 
+                            ? imagePath.replace('../', '') 
+                            : '../' + imagePath;
+                        
+                        imagePreview.src = altPath;
+                        document.getElementById('artworkImage').value = altPath;
+                        
+                        // Log error only if second attempt fails
+                        imagePreview.onerror = function() {
+                            console.error('Failed to load image:', imagePath);
+                            // Show fallback image
+                            imagePreview.src = '../images/placeholder.jpg';
+                        };
+                    };
+                    
                     imagePreviewContainer.style.display = 'block';
                     document.getElementById('dragDropArea').style.display = 'none';
                 }

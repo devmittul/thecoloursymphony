@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize sidebar navigation highlighting
     highlightCurrentPage();
     
+    // Load artworks from localStorage
+    loadArtworks();
+    
     // Initialize add artwork form
     setupArtworkForm();
 });

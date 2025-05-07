@@ -667,22 +667,67 @@
                 const storedArtworks = localStorage.getItem('artworks');
                 console.log('Artworks from localStorage:', storedArtworks ? 'Found data' : 'No data found');
                 
+                // Initialize artworks array
+                artworks = [];
+                
+                // Load artworks from localStorage
                 if (storedArtworks) {
                     try {
                         artworks = JSON.parse(storedArtworks);
                         console.log('Parsed artworks:', { count: artworks.length });
-                        filteredArtworks = [...artworks];
-                        renderArtworks(filteredArtworks);
                     } catch (error) {
                         console.error('Error parsing artworks JSON:', error);
-                        // No artworks found or error parsing
-                        renderEmptyState();
+                        artworks = [];
                     }
-                } else {
-                    console.log('No artworks found, rendering empty state');
-                    // No artworks found
-                    renderEmptyState();
                 }
+                
+                // Handle case where no artworks were found
+                if (artworks.length === 0) {
+                    console.log('No artworks found in localStorage, creating sample artworks');
+                    
+                    // Create sample artworks if none exist
+                    const sampleArtworks = [
+                        {
+                            id: Date.now(),
+                            title: "Sample Artwork 1",
+                            artist: "Admin",
+                            year: "2023",
+                            medium: "Oil on Canvas",
+                            dimensions: "24 x 36 inches",
+                            description: "A beautiful sample artwork to get you started.",
+                            dateAdded: new Date().toISOString().split('T')[0],
+                            featured: true,
+                            images: [
+                                { path: "../images/painting1.jpg", isPrimary: true }
+                            ]
+                        },
+                        {
+                            id: Date.now() + 1,
+                            title: "Sample Artwork 2",
+                            artist: "Admin",
+                            year: "2024",
+                            medium: "Acrylic",
+                            dimensions: "18 x 24 inches",
+                            description: "Another beautiful sample artwork to get you started.",
+                            dateAdded: new Date().toISOString().split('T')[0],
+                            featured: false,
+                            images: [
+                                { path: "../images/painting2.jpg", isPrimary: true }
+                            ]
+                        }
+                    ];
+                    
+                    // Add sample artworks to the array
+                    artworks = sampleArtworks;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('artworks', JSON.stringify(artworks));
+                    console.log('Sample artworks created and saved to localStorage');
+                }
+                
+                // Set filtered artworks and render
+                filteredArtworks = [...artworks];
+                renderArtworks(filteredArtworks);
                 
                 // Remove loading state
                 if (loadingState) {
