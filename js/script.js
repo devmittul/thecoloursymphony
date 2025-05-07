@@ -199,6 +199,7 @@ function loadAndDisplayArtworks() {
     if (storedArtworks) {
         try {
             artworks = JSON.parse(storedArtworks);
+            console.log('Loaded artworks from localStorage:', artworks.length);
         } catch (error) {
             console.error("Error parsing artworks:", error);
         }
@@ -206,6 +207,7 @@ function loadAndDisplayArtworks() {
     
     // Create sample artworks if none exist
     if (artworks.length === 0) {
+        console.log('No artworks found, creating samples');
         const sampleArtworks = [
             {
                 id: 1,
@@ -255,6 +257,7 @@ function loadAndDisplayArtworks() {
         // Create artwork element
         const artworkElement = document.createElement('div');
         artworkElement.className = 'gallery-item fade-in';
+        artworkElement.dataset.artworkId = artwork.id; // Add ID to DOM element for easy updating
         
         // Get image path, ensuring it works for both admin and main site paths
         let imagePath = '';
@@ -292,7 +295,38 @@ function loadAndDisplayArtworks() {
             openArtworkModal(artwork);
         });
     });
+    
+    // Store timestamp of last load to detect changes
+    localStorage.setItem('lastArtworkLoadTime', Date.now().toString());
 }
+
+// Function to check if artworks have been updated in localStorage
+function checkForArtworkUpdates() {
+    const lastLoadTime = localStorage.getItem('lastArtworkLoadTime') || 0;
+    const lastUpdateTime = localStorage.getItem('artworksLastUpdated') || 0;
+    
+    // If the artworks were updated after the last load time, reload them
+    if (parseInt(lastUpdateTime) > parseInt(lastLoadTime)) {
+        console.log('Artwork updates detected, reloading gallery');
+        loadAndDisplayArtworks();
+    }
+}
+
+// Listen for storage events to detect changes from admin panel
+window.addEventListener('storage', (event) => {
+    if (event.key === 'artworks') {
+        console.log('Artworks updated in localStorage, reloading gallery');
+        loadAndDisplayArtworks();
+    }
+});
+
+// Periodically check for updates (every 5 seconds)
+setInterval(checkForArtworkUpdates, 5000);
+
+// Add a custom event listener for artwork changes
+document.addEventListener('artworksUpdated', () => {
+    loadAndDisplayArtworks();
+});
 
 // Generate a random review text
 function generateRandomReview() {

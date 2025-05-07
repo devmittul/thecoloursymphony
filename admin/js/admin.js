@@ -436,6 +436,15 @@ function setupArtworkForm() {
             artworks.push(newArtwork);
             localStorage.setItem('artworks', JSON.stringify(artworks));
             
+            // Set timestamp to indicate update
+            localStorage.setItem('artworksLastUpdated', Date.now().toString());
+            
+            // Dispatch custom event for any listeners
+            if (typeof window.parent !== 'undefined') {
+                const event = new CustomEvent('artworksUpdated');
+                window.parent.document.dispatchEvent(event);
+            }
+            
             // Show success message
             showAlert('Artwork saved successfully! It will now appear on the website.', 'success');
             
