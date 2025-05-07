@@ -92,6 +92,24 @@ The website works in all modern browsers:
 
 This project is available for personal and commercial use.
 
+## Deployment
+
+This website is deployed on Firebase hosting with the following features:
+- Secure hosting with CDN
+- Firebase Authentication for the admin panel
+- Firebase Storage for artwork images
+- Fast loading times and global availability
+
+You can also deploy this project on GitHub Pages:
+1. Fork this repository
+2. Go to Settings > Pages
+3. Select the main branch as the source
+4. Click Save
+
+## GitHub Repository
+
+This project is available on GitHub at [https://github.com/devmittul/thecoloursymphony](https://github.com/devmittul/thecoloursymphony)
+
 ## Credits
 
 - Fonts from [Google Fonts](https://fonts.google.com/)
