@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Sample Artworks</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Remove Sample Artworks</h1>
+    <p>This utility will remove all sample artworks from the website's localStorage.</p>
+    
+    <button id="removeBtn">Remove Sample Artworks</button>
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('removeBtn').addEventListener('click', function() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                // Load artworks from localStorage
+                let artworks = [];
+                const storedArtworks = localStorage.getItem('artworks');
+                
+                if (storedArtworks) {
+                    artworks = JSON.parse(storedArtworks);
+                    const originalCount = artworks.length;
+                    
+                    // Filter out sample artworks
+                    artworks = artworks.filter(artwork => {
+                        const isSample = 
+                            (artwork.description && artwork.description.toLowerCase().includes('sample')) || 
+                            (artwork.title && artwork.title.toLowerCase().includes('sample')) ||
+                            (artwork.images && artwork.images.some(img => 
+                                img.path && (img.path.includes('painting1.jpg') || img.path.includes('painting2.jpg'))
+                            ));
+                        return !isSample;
+                    });
+                    
+                    // Save filtered artworks back to localStorage
+                    localStorage.setItem('artworks', JSON.stringify(artworks));
+                    
+                    // Set timestamp for update
+                    localStorage.setItem('artworksLastUpdated', Date.now().toString());
+                    
+                    // Set flag to indicate data needs publishing to GitHub
+                    localStorage.setItem('artworksNeedPublishing', 'true');
+                    
+                    // Show results
+                    const removedCount = originalCount - artworks.length;
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <h3>Success!</h3>
+                            <p>Removed ${removedCount} sample artwork(s) from localStorage.</p>
+                            <p>Original count: ${originalCount}</p>
+                            <p>New count: ${artworks.length}</p>
+                            <p>Remember to publish these changes to make them permanent.</p>
+                        </div>
+                        <h3>Remaining Artworks:</h3>
+                        <pre>${JSON.stringify(artworks, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            <h3>No artworks found</h3>
+                            <p>There are no artworks stored in localStorage.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>Error occurred</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html> 
