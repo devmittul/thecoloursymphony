@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Color Symphony</title>
+    <script>
+        // Check if user is logged in
+        if (localStorage.getItem('adminLoggedIn') === 'true') {
+            // If logged in, redirect to manage artworks page
+            window.location.href = "manage-artworks.html";
+        } else {
+            // If not logged in, redirect to login page
+            window.location.href = "login.html";
+        }
+    </script>
+</head>
+<body>
+    <p>If you are not redirected automatically, <a href="manage-artworks.html">click here</a> if you're logged in, or <a href="login.html">login here</a>.</p>
+</body>
+</html> 

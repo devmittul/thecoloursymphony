@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Artworks - The Color Symphony</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+    <style>
+        .all-artworks {
+            padding: 100px 0 80px;
+            background-color: var(--background-light);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .page-header h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .subtitle {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .filter-controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: var(--primary-color);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filter-group label {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            color: var(--accent-color);
+        }
+        
+        .filter-group select {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: white;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(141, 123, 104, 0.2);
+        }
+        
+        .all-artworks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .artwork-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .artwork-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(141, 123, 104, 0.25);
+        }
+        
+        .artwork-image {
+            position: relative;
+            overflow: hidden;
+            height: 280px;
+        }
+        
+        .artwork-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .artwork-card:hover .artwork-image img {
+            transform: scale(1.05);
+        }
+        
+        .artwork-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            padding: 20px;
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .artwork-card:hover .artwork-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .artwork-details {
+            padding: 20px;
+        }
+        
+        .artwork-details h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+        
+        .artwork-medium {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: var(--accent-color-light);
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+        
+        .artwork-description {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .view-details-btn {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: max-content;
+        }
+        
+        .view-details-btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+        }
+        
+        .view-details-btn i {
+            transition: transform 0.3s ease;
+        }
+        
+        .view-details-btn:hover i {
+            transform: translateX(4px);
+        }
+        
+        .featured-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 50px;
+        }
+        
+        .pagination-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--accent-color);
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .pagination-btn:hover:not([disabled]) {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-numbers {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .page-number {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-number:hover,
+        .page-number.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .filter-group select {
+                width: 100%;
+            }
+            
+            .all-artworks-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .all-artworks-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .pagination {
+                flex-wrap: wrap;
+            }
+        }
+        
+        /* Animation delays for staggered appearance */
+        .artwork-card:nth-child(1) { animation-delay: 0.1s; }
+        .artwork-card:nth-child(2) { animation-delay: 0.2s; }
+        .artwork-card:nth-child(3) { animation-delay: 0.3s; }
+        .artwork-card:nth-child(4) { animation-delay: 0.4s; }
+        .artwork-card:nth-child(5) { animation-delay: 0.5s; }
+        .artwork-card:nth-child(6) { animation-delay: 0.6s; }
+        .artwork-card:nth-child(7) { animation-delay: 0.7s; }
+        .artwork-card:nth-child(8) { animation-delay: 0.8s; }
+        .artwork-card:nth-child(9) { animation-delay: 0.9s; }
+    </style>
+</head>
+<body>
+    <div class="cursor"></div>
+    
+    <header>
+            <div class="logo">
+            <h1>The Color Symphony</h1>
+            </div>
+        <button class="menu-btn" aria-label="Toggle menu">
+            <span></span>
+        </button>
+            <nav>
+                <ul>
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="index.html#gallery"><i class="fas fa-image"></i> Gallery</a></li>
+                <li><a href="all-artworks.html" class="active"><i class="fas fa-palette"></i> All Artworks</a></li>
+                <li><a href="index.html#about"><i class="fas fa-user"></i> About</a></li>
+                </ul>
+            </nav>
+    </header>
+
+    <!-- Back to top button -->
+    <a href="#" class="back-to-top" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+
+    <!-- All Artworks Section -->
+    <section class="all-artworks">
+        <div class="container">
+            <div class="page-header">
+                <h1>Art Collection</h1>
+                <p class="subtitle">Explore the complete collection of timeless artworks that capture the essence of beauty through color and form.</p>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="medium-filter"><i class="fas fa-filter"></i> Filter by Medium:</label>
+                    <select id="medium-filter">
+                        <option value="all">All Mediums</option>
+                        <option value="oil">Oil on Canvas</option>
+                        <option value="acrylic">Acrylic</option>
+                        <option value="watercolor">Watercolor</option>
+                        <option value="mixed-media">Mixed Media</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sort-select"><i class="fas fa-sort"></i> Sort by:</label>
+                    <select id="sort-select">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="title-az">Title: A to Z</option>
+                        <option value="title-za">Title: Z to A</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Artworks Grid Container -->
+            <div class="all-artworks-container">
+                <!-- Sample Artwork Cards - Will be dynamically populated with JavaScript -->
+                <div class="artwork-card">
+                    <div class="featured-badge">
+                        <i class="fas fa-star"></i> Featured
+                    </div>
+                    <div class="artwork-image">
+                        <img src="images/painting1.jpg" alt="Ethereal Dreams">
+                        <div class="artwork-overlay">
+                            <h3>Ethereal Dreams</h3>
+                            <p>A vibrant exploration of dreamscapes and subconscious imagery.</p>
+                        </div>
+                    </div>
+                    <div class="artwork-details">
+                        <h3>Ethereal Dreams</h3>
+                        <p class="artwork-medium">Acrylic on Canvas, 2025</p>
+                        <p class="artwork-description">A vibrant exploration of dreamscapes and subconscious imagery. This piece invites viewers to lose themselves in layers of ethereal color and form.</p>
+                        <a href="artwork-details.html?id=1" class="view-details-btn">View Details <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="artwork-card">
+                    <div class="featured-badge">
+                        <i class="fas fa-star"></i> Featured
+                    </div>
+                    <div class="artwork-image">
+                        <img src="images/painting2.jpg" alt="Serene Horizon">
+                        <div class="artwork-overlay">
+                            <h3>Serene Horizon</h3>
+                            <p>Inspired by coastal landscapes at dawn.</p>
+                        </div>
+                    </div>
+                    <div class="artwork-details">
+                        <h3>Serene Horizon</h3>
+                        <p class="artwork-medium">Oil on Canvas, 2025</p>
+                        <p class="artwork-description">Inspired by coastal landscapes at dawn, this painting captures the tranquil moment when sky meets sea in perfect harmony.</p>
+                        <a href="artwork-details.html?id=2" class="view-details-btn">View Details <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="artwork-card">
+                    <div class="artwork-image">
+                        <img src="images/painting3.jpg" alt="Inner Light">
+                        <div class="artwork-overlay">
+                            <h3>Inner Light</h3>
+                            <p>An intimate portrait exploring themes of self-discovery.</p>
+                        </div>
+                    </div>
+                    <div class="artwork-details">
+                        <h3>Inner Light</h3>
+                        <p class="artwork-medium">Mixed Media, 2025</p>
+                        <p class="artwork-description">An intimate portrait exploring themes of self-discovery and inner illumination through textured layers and subtle color shifts.</p>
+                        <a href="artwork-details.html?id=3" class="view-details-btn">View Details <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="artwork-card">
+                    <div class="featured-badge">
+                        <i class="fas fa-star"></i> Featured
+                    </div>
+                    <div class="artwork-image">
+                        <img src="images/painting4.jpg" alt="Cosmic Whispers">
+                        <div class="artwork-overlay">
+                            <h3>Cosmic Whispers</h3>
+                            <p>Inspired by celestial bodies and the mysteries of deep space.</p>
+                        </div>
+                    </div>
+                    <div class="artwork-details">
+                        <h3>Cosmic Whispers</h3>
+                        <p class="artwork-medium">Acrylic on Canvas, 2025</p>
+                        <p class="artwork-description">This abstract piece draws inspiration from celestial bodies and the mysteries of deep space, rendered in bold strokes and dynamic color relationships.</p>
+                        <a href="artwork-details.html?id=4" class="view-details-btn">View Details <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="artwork-card">
+                    <div class="artwork-image">
+                        <img src="images/painting5.jpg" alt="Blooming Silence">
+                        <div class="artwork-overlay">
+                            <h3>Blooming Silence</h3>
+                            <p>A delicate botanical study that celebrates the quiet beauty of nature.</p>
+                        </div>
+                    </div>
+                    <div class="artwork-details">
+                        <h3>Blooming Silence</h3>
+                        <p class="artwork-medium">Watercolor, 2025</p>
+                        <p class="artwork-description">A delicate botanical study that celebrates the quiet beauty of nature. Transparent washes create a sense of depth and light.</p>
+                        <a href="artwork-details.html?id=5" class="view-details-btn">View Details <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="artwork-card">
+                    <div class="featured-badge">
+                        <i class="fas fa-star"></i> Featured
+                    </div>
+                    <div class="artwork-image">
+                        <img src="images/painting6.jpg" alt="Vibrant Echoes">
+                        <div class="artwork-overlay">
+                            <h3>Vibrant Echoes</h3>
+                            <p>Bold colors and dynamic compositions create visual rhythms.</p>
+                        </div>
+                    </div>
+                    <div class="artwork-details">
+                        <h3>Vibrant Echoes</h3>
+                        <p class="artwork-medium">Oil on Canvas, 2025</p>
+                        <p class="artwork-description">Bold colors and dynamic compositions create visual rhythms that seem to pulsate with energy and movement across the canvas.</p>
+                        <a href="artwork-details.html?id=6" class="view-details-btn">View Details <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="pagination-btn" disabled>
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <div class="page-numbers">
+                    <div class="page-number active">1</div>
+                    <div class="page-number">2</div>
+                    <div class="page-number">3</div>
+                </div>
+                <button class="pagination-btn">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+            <div class="footer-content">
+                <div class="footer-logo">
+                <h2>The Color Symphony</h2>
+                <p>Bringing art to life through color and form.</p>
+                </div>
+                <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="index.html#gallery">Gallery</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="admin/login.html">Admin</a></li>
+                    </ul>
+                </div>
+            <div class="footer-dev">
+                <h3>Developer</h3>
+                <div class="dev-card">
+                    <div class="dev-card-inner">
+                        <div class="dev-card-front">
+                            <div class="dev-avatar">
+                                <img src="images/developer.png" alt="Developer Mittul">
+                            </div>
+                            <h4>Mittul Dall</h4>
+                            <span class="dev-click-hint">Click to Connect <i class="fas fa-hand-pointer"></i></span>
+                        </div>
+                        <div class="dev-card-back">
+                            <div class="dev-social-links">
+                                <a href="https://devmittul.github.io/myintro/" target="_blank" rel="noopener" aria-label="Portfolio"><i class="fas fa-globe"></i></a>
+                                <a href="https://www.linkedin.com/in/immittul?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                                <a href="mailto:devmittul@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                            </div>
+                            <p>Self-made Developer passionate about blending creativity with functionality.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 The Color Symphony. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Ensure the footer is visible
+        document.addEventListener("DOMContentLoaded", function() {
+            // Force footer to be visible
+            const footer = document.querySelector('footer');
+            if (footer) {
+                footer.style.opacity = '1';
+                footer.style.visibility = 'visible';
+                footer.classList.add('in-view');
+            }
+            
+            // Filter functionality
+            const mediumFilter = document.getElementById('medium-filter');
+            const sortSelect = document.getElementById('sort-select');
+            const artworkCards = document.querySelectorAll('.artwork-card');
+            
+            // Add event listeners to filter controls
+            if (mediumFilter && sortSelect) {
+                mediumFilter.addEventListener('change', filterArtworks);
+                sortSelect.addEventListener('change', filterArtworks);
+            }
+            
+            function filterArtworks() {
+                const mediumValue = mediumFilter.value;
+                const sortValue = sortSelect.value;
+                
+                // This is a simplified version for demonstration
+                // In a real implementation, you would filter the actual data and re-render the cards
+                console.log(`Filtering by: ${mediumValue}, Sorting by: ${sortValue}`);
+                
+                // Add animation to show filtering happened
+                artworkCards.forEach(card => {
+                    card.classList.add('fade-effect');
+                    setTimeout(() => {
+                        card.classList.remove('fade-effect');
+                    }, 500);
+                });
+            }
+            
+            // Pagination functionality
+            const pageNumbers = document.querySelectorAll('.page-number');
+            const prevBtn = document.querySelector('.pagination-btn:first-child');
+            const nextBtn = document.querySelector('.pagination-btn:last-child');
+            
+            pageNumbers.forEach(page => {
+                page.addEventListener('click', function() {
+                    // Remove active class from all page numbers
+                    pageNumbers.forEach(p => p.classList.remove('active'));
+                    // Add active class to the clicked page number
+                    this.classList.add('active');
+                    
+                    // Enable/disable pagination buttons based on current page
+                    if (this.textContent.trim() === '1') {
+                        prevBtn.disabled = true;
+                    } else {
+                        prevBtn.disabled = false;
+                    }
+                    
+                    if (this.textContent.trim() === '3') {
+                        nextBtn.disabled = true;
+                    } else {
+                        nextBtn.disabled = false;
+                    }
+                    
+                    // Add animation to show page change
+                    artworkCards.forEach(card => {
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                        }, 300);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

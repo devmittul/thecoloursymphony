@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Artwork - The Color Symphony</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBeM-N2EhqwL593MNn7ZW-S0OWvMgDToRs",
+            authDomain: "thecoloursymphony.firebaseapp.com",
+            projectId: "thecoloursymphony",
+            storageBucket: "thecoloursymphony.appspot.com",
+            messagingSenderId: "1075361168499",
+            appId: "1:1075361168499:web:35ee7ac9dd5f1c0aaac200"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    
+    <style>
+        /* Mobile-friendly styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .admin-dashboard {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        /* Mobile header */
+        .mobile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #8d7b68;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .mobile-header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Mobile sidebar */
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100%;
+            background-color: #fff;
+            transition: all 0.3s ease;
+            z-index: 200;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        
+        .admin-sidebar.active {
+            left: 0;
+        }
+        
+        .close-sidebar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+        }
+        
+        .admin-sidebar-header {
+            padding: 20px 15px;
+            background-color: #8d7b68;
+            color: white;
+        }
+        
+        .admin-sidebar-header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        
+        .admin-sidebar-header p {
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .admin-sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .admin-sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: #333;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .admin-sidebar-menu li a i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .admin-sidebar-menu li a.active,
+        .admin-sidebar-menu li a:hover {
+            background-color: #f5f1eb;
+            color: #8d7b68;
+        }
+        
+        /* Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 150;
+            display: none;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
+        /* Main content */
+        .admin-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+        
+        .admin-content {
+            padding: 15px;
+        }
+        
+        /* Form styles */
+        .admin-form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .form-help {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        .checkbox-label input {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* Button styles */
+        .admin-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .admin-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #8d7b68;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+        }
+        
+        .admin-btn:hover {
+            background-color: #a4907c;
+        }
+        
+        .admin-btn.secondary {
+            background-color: #6c757d;
+        }
+        
+        /* Mobile-optimized drag & drop */
+        .drag-drop-area {
+            border: 2px dashed #a4907c;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: #f9f7f5;
+            margin-bottom: 10px;
+        }
+        
+        .upload-icon i {
+            font-size: 3rem;
+            color: #a4907c;
+            margin-bottom: 10px;
+        }
+        
+        .mobile-upload-btn {
+            background-color: #a4907c;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        #imagePreview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .toast.success {
+            background-color: #28a745;
+        }
+        
+        .toast.error {
+            background-color: #dc3545;
+        }
+        
+        /* Media queries for larger screens */
+        @media (min-width: 768px) {
+            .admin-dashboard {
+                flex-direction: row;
+            }
+            
+            .mobile-header {
+                display: none;
+            }
+            
+            .admin-sidebar {
+                position: static;
+                width: 250px;
+                max-width: none;
+                left: 0;
+                box-shadow: none;
+                border-right: 1px solid #eee;
+            }
+            
+            .close-sidebar {
+                display: none;
+            }
+            
+            .admin-main {
+                flex: 1;
+                padding: 20px;
+            }
+            
+            .admin-actions {
+                flex-direction: row;
+                justify-content: flex-start;
+            }
+            
+            .admin-btn {
+                min-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <button class="menu-toggle" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1>Edit Artwork</h1>
+            <div class="user-icon">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+        
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay"></div>
+        
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <button class="close-sidebar" aria-label="Close menu">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="admin-sidebar-header">
+                <h1>The Color Symphony</h1>
+                <p>Admin Dashboard</p>
+            </div>
+            <ul class="admin-sidebar-menu">
+                <li><a href="add-artwork.html"><i class="fas fa-plus-circle"></i> Add New Artwork</a></li>
+                <li><a href="manage-artworks.html"><i class="fas fa-paint-brush"></i> Manage Artworks</a></li>
+                <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="admin-content">
+                <form id="editArtworkForm">
+                    <div class="admin-form-group">
+                        <label for="artworkTitle">Artwork Title</label>
+                        <input type="text" id="artworkTitle" name="title" required>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="artworkMedium">Medium</label>
+                        <input type="text" id="artworkMedium" name="medium" placeholder="E.g., Oil on Canvas, Acrylic, Watercolor, etc." required>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="artworkYear">Year</label>
+                        <input type="text" id="artworkYear" name="year" placeholder="E.g., 2025" required>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="artworkDate">Creation Date</label>
+                        <input type="date" id="artworkDate" name="creationDate">
+                        <p class="form-help">Used for sorting recent artworks on the homepage.</p>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="artworkDescription">Description</label>
+                        <textarea id="artworkDescription" name="description" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="artworkImage">Image</label>
+                        <div id="imageUploadContainer">
+                            <!-- This will be replaced by JS with the drag & drop area -->
+                        </div>
+                        <input type="hidden" id="artworkImage" name="image" required>
+                    </div>
+                    
+                    <div class="admin-form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="artworkFeatured" name="featured">
+                            Feature this artwork
+                        </label>
+                    </div>
+                    
+                    <div class="admin-actions">
+                        <button type="submit" class="admin-btn">Update Artwork</button>
+                        <a href="manage-artworks.html" class="admin-btn secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast notification -->
+    <div id="toast" class="toast">Action completed</div>
+
+    <script>
+        // Global variables
+        let artworks = [];
+        let currentArtworkId = null;
+        let storageRef;
+        let firebaseStorage;
+        
+        // Initialize Firebase if available
+        function initFirebase() {
+            try {
+                // Check if Firebase is loaded
+                if (typeof firebase !== 'undefined') {
+                    // Initialize Firebase Storage reference
+                    firebaseStorage = firebase.storage();
+                    storageRef = firebaseStorage.ref();
+                    console.log('Firebase Storage initialized');
+                }
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+            }
+        }
+        
+        // Check authentication and initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if logged in
+            const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Initialize Firebase
+            initFirebase();
+            
+            // Initialize mobile menu
+            initMobileMenu();
+            
+            // Get artwork ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            currentArtworkId = urlParams.get('id');
+            
+            if (!currentArtworkId) {
+                // No ID provided, redirect to manage page
+                window.location.href = 'manage-artworks.html';
+                return;
+            }
+            
+            // Load artwork data
+            loadArtworkData(currentArtworkId);
+            
+            // Set up form submission
+            setupFormSubmission();
+            
+            // Set up image upload
+            setupImageUpload();
+        });
+        
+        // Initialize mobile menu
+        function initMobileMenu() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const closeSidebar = document.querySelector('.close-sidebar');
+            const sidebar = document.querySelector('.admin-sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            function closeSidebarMenu() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            closeSidebar.addEventListener('click', closeSidebarMenu);
+            overlay.addEventListener('click', closeSidebarMenu);
+            
+            // Set up logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('adminLoggedIn');
+                window.location.href = 'login.html';
+            });
+        }
+        
+        // Load artwork data
+        function loadArtworkData(artworkId) {
+            // Load artworks from localStorage
+            const storedArtworks = localStorage.getItem('artworks');
+            
+            if (storedArtworks) {
+                artworks = JSON.parse(storedArtworks);
+                
+                // Find the artwork with the matching ID
+                const artwork = artworks.find(item => item.id.toString() === artworkId.toString());
+                
+                if (artwork) {
+                    // Populate form with artwork data
+                    populateForm(artwork);
+                } else {
+                    // Artwork not found
+                    showToast('Artwork not found', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'manage-artworks.html';
+                    }, 2000);
+                }
+            } else {
+                // No artworks in storage
+                showToast('No artworks found', 'error');
+                setTimeout(() => {
+                    window.location.href = 'manage-artworks.html';
+                }, 2000);
+            }
+        }
+        
+        // Populate form with artwork data
+        function populateForm(artwork) {
+            document.getElementById('artworkTitle').value = artwork.title || '';
+            document.getElementById('artworkMedium').value = artwork.medium || '';
+            document.getElementById('artworkYear').value = artwork.year || '';
+            document.getElementById('artworkDescription').value = artwork.description || '';
+            document.getElementById('artworkFeatured').checked = artwork.featured || false;
+            
+            // Set date if available
+            if (artwork.dateAdded) {
+                document.getElementById('artworkDate').value = artwork.dateAdded;
+            }
+            
+            // Set image
+            if (artwork.images && artwork.images.length > 0) {
+                document.getElementById('artworkImage').value = artwork.images[0].path;
+                
+                // Preview image if available
+                const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                if (imagePreviewContainer) {
+                    const imagePreview = document.getElementById('imagePreview');
+                    imagePreview.src = artwork.images[0].path;
+                    imagePreviewContainer.style.display = 'block';
+                    document.getElementById('dragDropArea').style.display = 'none';
+                }
+            }
+        }
+        
+        // Setup image upload
+        function setupImageUpload() {
+            const imageUploadContainer = document.getElementById('imageUploadContainer');
+            const imageInputField = document.getElementById('artworkImage');
+            
+            if (!imageUploadContainer || !imageInputField) return;
+            
+            // Create the image upload container
+            imageUploadContainer.innerHTML = `
+                <div class="drag-drop-area" id="dragDropArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text">
+                        <p>Tap to select image</p>
+                        <p>- or -</p>
+                        <p>Drag & drop image here</p>
+                    </div>
+                    <button type="button" class="mobile-upload-btn" id="uploadButton">
+                        <i class="fas fa-camera"></i> Select from Device
+                    </button>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+                <div class="image-preview-container" id="imagePreviewContainer" style="display: none;">
+                    <img id="imagePreview" src="" alt="Image Preview">
+                    <div class="image-controls">
+                        <button type="button" class="admin-btn" id="removeImageBtn" style="margin-top: 10px; background-color: #dc3545;">
+                            <i class="fas fa-times"></i> Remove
+                        </button>
+                    </div>
+                </div>
+                <p class="form-help">Upload a new image to replace the current one (optional).</p>
+            `;
+            
+            // Set up the drag and drop functionality
+            const dragDropArea = document.getElementById('dragDropArea');
+            const uploadButton = document.getElementById('uploadButton');
+            const fileInput = document.getElementById('fileInput');
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            const imagePreview = document.getElementById('imagePreview');
+            const removeImageBtn = document.getElementById('removeImageBtn');
+            
+            // Make the entire drop area clickable to select a file on mobile
+            dragDropArea.addEventListener('click', function(e) {
+                // Prevent click on the upload button from triggering this too
+                if (e.target !== uploadButton && !uploadButton.contains(e.target)) {
+                    fileInput.click();
+                }
+            });
+            
+            // Handle tap on the upload button
+            uploadButton.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dragDropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            // Highlight drop area when dragging over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dragDropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dragDropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dragDropArea.classList.add('highlight');
+            }
+            
+            function unhighlight() {
+                dragDropArea.classList.remove('highlight');
+            }
+            
+            // Handle dropped files
+            dragDropArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    handleFiles(files);
+                }
+            }
+            
+            // Handle files from file input
+            fileInput.addEventListener('change', function() {
+                if (this.files.length) {
+                    handleFiles(this.files);
+                }
+            });
+            
+            // Process the files
+            function handleFiles(files) {
+                const file = files[0]; // Just take the first file
+                
+                if (file.type.match('image.*')) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        // Show the image preview
+                        imagePreview.src = e.target.result;
+                        dragDropArea.style.display = 'none';
+                        imagePreviewContainer.style.display = 'block';
+                        
+                        if (firebaseStorage) {
+                            // Store file in memory for later upload to Firebase
+                            imagePreview.file = file;
+                            // Set a temporary path (will be replaced when actually uploaded)
+                            imageInputField.value = `uploading:${file.name}`;
+                        } else {
+                            // Fallback for when Firebase isn't available
+                            const fileName = `../images/${file.name}`;
+                            imageInputField.value = fileName;
+                        }
+                    };
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    showToast('Please select an image file (JPG, PNG, etc).', 'error');
+                }
+            }
+            
+            // Remove image button
+            removeImageBtn.addEventListener('click', function() {
+                // Clear the preview
+                imagePreview.src = '';
+                imagePreviewContainer.style.display = 'none';
+                dragDropArea.style.display = 'block';
+                
+                // Clear the input value
+                imageInputField.value = '';
+            });
+        }
+        
+        // Setup form submission
+        function setupFormSubmission() {
+            const form = document.getElementById('editArtworkForm');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate form
+                if (!validateForm()) {
+                    return;
+                }
+                
+                // Show loading state
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                submitButton.disabled = true;
+                
+                // Get form data
+                const formData = {
+                    id: currentArtworkId,
+                    title: document.getElementById('artworkTitle').value,
+                    medium: document.getElementById('artworkMedium').value,
+                    year: document.getElementById('artworkYear').value,
+                    description: document.getElementById('artworkDescription').value,
+                    dateAdded: document.getElementById('artworkDate').value,
+                    featured: document.getElementById('artworkFeatured').checked,
+                    image: document.getElementById('artworkImage').value
+                };
+                
+                // Function to save artwork data
+                const saveArtworkData = (imageUrl) => {
+                    // Update image URL if a new one is provided
+                    if (imageUrl) {
+                        formData.image = imageUrl;
+                    }
+                    
+                    // Find artwork in the array
+                    const index = artworks.findIndex(artwork => artwork.id.toString() === currentArtworkId.toString());
+                    
+                    if (index === -1) {
+                        showToast('Artwork not found', 'error');
+                        submitButton.innerHTML = originalText;
+                        submitButton.disabled = false;
+                        return;
+                    }
+                    
+                    // Update the artwork data
+                    const updatedArtwork = {
+                        ...artworks[index],
+                        title: formData.title,
+                        medium: formData.medium,
+                        year: formData.year,
+                        description: formData.description,
+                        featured: formData.featured,
+                        dateAdded: formData.dateAdded || artworks[index].dateAdded
+                    };
+                    
+                    // Update image if changed
+                    if (formData.image && formData.image !== '') {
+                        updatedArtwork.images = [
+                            { path: formData.image, isPrimary: true }
+                        ];
+                    }
+                    
+                    // Update artwork in array
+                    artworks[index] = updatedArtwork;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('artworks', JSON.stringify(artworks));
+                    
+                    // Show success message
+                    showToast('Artwork updated successfully!', 'success');
+                    
+                    // Restore button
+                    submitButton.innerHTML = originalText;
+                    submitButton.disabled = false;
+                    
+                    // Redirect after delay
+                    setTimeout(() => {
+                        window.location.href = 'manage-artworks.html';
+                    }, 1500);
+                };
+                
+                // If we're using Firebase and have a new image to upload
+                if (firebaseStorage && imagePreview?.file) {
+                    // Upload to Firebase Storage
+                    const metadata = {
+                        contentType: imagePreview.file.type
+                    };
+                    
+                    // Generate a unique filename
+                    const filename = `artwork_${currentArtworkId}_${Date.now()}_${imagePreview.file.name}`;
+                    const artworkImagesRef = storageRef.child(`artworks/${filename}`);
+                    
+                    artworkImagesRef.put(imagePreview.file, metadata)
+                        .then(snapshot => snapshot.ref.getDownloadURL())
+                        .then(downloadURL => {
+                            // Save artwork with Firebase Storage URL
+                            saveArtworkData(downloadURL);
+                        })
+                        .catch(error => {
+                            console.error('Upload failed:', error);
+                            showToast('Failed to upload image. Please try again.', 'error');
+                            submitButton.innerHTML = originalText;
+                            submitButton.disabled = false;
+                        });
+                } else {
+                    // No new image or Firebase not available
+                    saveArtworkData();
+                }
+            });
+        }
+        
+        // Validate form
+        function validateForm() {
+            const title = document.getElementById('artworkTitle').value;
+            const medium = document.getElementById('artworkMedium').value;
+            const year = document.getElementById('artworkYear').value;
+            const description = document.getElementById('artworkDescription').value;
+            
+            if (!title || !medium || !year || !description) {
+                showToast('Please fill out all required fields', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Show toast notification
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            
+            // Reset classes
+            toast.className = 'toast';
+            
+            // Add type class if provided
+            if (type) {
+                toast.classList.add(type);
+            }
+            
+            // Show toast
+            toast.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 

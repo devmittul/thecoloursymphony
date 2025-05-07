@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug localStorage - The Color Symphony</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #8d7b68;
+            margin-bottom: 20px;
+        }
+        
+        .debug-section {
+            background-color: #f5f1eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .debug-item {
+            margin-bottom: 10px;
+        }
+        
+        .debug-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .debug-value {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+        }
+        
+        .debug-actions {
+            margin-top: 20px;
+        }
+        
+        .debug-btn {
+            background-color: #8d7b68;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .debug-btn.secondary {
+            background-color: #6c757d;
+        }
+        
+        .debug-btn.danger {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug localStorage</h1>
+    
+    <div class="debug-section">
+        <h2>Authentication Status</h2>
+        <div class="debug-item">
+            <span class="debug-label">Admin Logged In:</span>
+            <div id="adminLoggedIn" class="debug-value">Loading...</div>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Artworks Data</h2>
+        <div class="debug-item">
+            <span class="debug-label">Artworks in localStorage:</span>
+            <div id="artworksData" class="debug-value">Loading...</div>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>All localStorage Keys</h2>
+        <div class="debug-item">
+            <span class="debug-label">Available Keys:</span>
+            <div id="localStorageKeys" class="debug-value">Loading...</div>
+        </div>
+    </div>
+    
+    <div class="debug-actions">
+        <button id="createSampleArtworks" class="debug-btn">Create Sample Artworks</button>
+        <button id="setLoggedIn" class="debug-btn">Set Admin Logged In</button>
+        <button id="clearArtworks" class="debug-btn danger">Clear Artworks</button>
+        <a href="manage-artworks.html" class="debug-btn secondary">Go to Manage Artworks</a>
+        <a href="login.html" class="debug-btn secondary">Go to Login</a>
+    </div>
+    
+    <script>
+        // Load and display localStorage data
+        function loadLocalStorageData() {
+            // Check admin logged in status
+            const adminLoggedIn = localStorage.getItem('adminLoggedIn');
+            document.getElementById('adminLoggedIn').textContent = adminLoggedIn || 'null';
+            
+            // Check artworks data
+            const artworksData = localStorage.getItem('artworks');
+            if (artworksData) {
+                try {
+                    const formatted = JSON.stringify(JSON.parse(artworksData), null, 2);
+                    document.getElementById('artworksData').textContent = formatted;
+                } catch (e) {
+                    document.getElementById('artworksData').textContent = `Error parsing JSON: ${e.message}\nRaw data: ${artworksData}`;
+                }
+            } else {
+                document.getElementById('artworksData').textContent = 'No artworks found in localStorage';
+            }
+            
+            // List all localStorage keys
+            const keys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                keys.push(key);
+            }
+            document.getElementById('localStorageKeys').textContent = keys.join('\n');
+        }
+        
+        // Create sample artworks
+        function createSampleArtworks() {
+            const sampleArtworks = [
+                {
+                    id: 1,
+                    title: "Sample Artwork 1",
+                    medium: "Oil on Canvas",
+                    year: "2023",
+                    description: "This is a sample artwork created for debugging purposes.",
+                    dateAdded: new Date().toISOString().split('T')[0],
+                    featured: true,
+                    images: [
+                        {
+                            path: "../images/placeholder.jpg",
+                            isPrimary: true
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    title: "Sample Artwork 2",
+                    medium: "Acrylic",
+                    year: "2024",
+                    description: "Another sample artwork for testing.",
+                    dateAdded: new Date().toISOString().split('T')[0],
+                    featured: false,
+                    images: [
+                        {
+                            path: "../images/placeholder.jpg",
+                            isPrimary: true
+                        }
+                    ]
+                }
+            ];
+            
+            localStorage.setItem('artworks', JSON.stringify(sampleArtworks));
+            alert('Sample artworks created successfully!');
+            loadLocalStorageData();
+        }
+        
+        // Set admin logged in
+        function setAdminLoggedIn() {
+            localStorage.setItem('adminLoggedIn', 'true');
+            alert('Admin logged in status set to true');
+            loadLocalStorageData();
+        }
+        
+        // Clear artworks
+        function clearArtworks() {
+            if (confirm('Are you sure you want to clear all artworks data?')) {
+                localStorage.removeItem('artworks');
+                alert('Artworks cleared from localStorage');
+                loadLocalStorageData();
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load data
+            loadLocalStorageData();
+            
+            // Set up event listeners
+            document.getElementById('createSampleArtworks').addEventListener('click', createSampleArtworks);
+            document.getElementById('setLoggedIn').addEventListener('click', setAdminLoggedIn);
+            document.getElementById('clearArtworks').addEventListener('click', clearArtworks);
+        });
+    </script>
+</body>
+</html> 

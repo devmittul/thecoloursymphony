@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Color Symphony - Art Gallery</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="cursor"></div>
+    
+    <header>
+        <div class="logo">
+            <h1>The Color Symphony</h1>
+        </div>
+        <button class="menu-btn" aria-label="Toggle menu">
+            <span></span>
+        </button>
+        <nav>
+            <ul>
+                <li><a href="#home" class="active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#gallery"><i class="fas fa-image"></i> Gallery</a></li>
+                <li><a href="#about"><i class="fas fa-user"></i> About</a></li>
+                <li><a href="all-artworks.html"><i class="fas fa-palette"></i> All Artworks</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Back to top button -->
+    <a href="#" class="back-to-top" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+
+    <section id="home" class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="ornament"></div>
+            <h1 class="animate-text"><span>Welcome to</span> The Color Symphony</h1>
+            <p class="animate-text delay-1">Discover a curated collection of timeless artworks that capture the essence of beauty through color and form.</p>
+            <a href="#gallery" class="btn animate-text delay-2">Explore Our Gallery</a>
+            <div class="ornament"></div>
+        </div>
+    </section>
+
+    <section class="featured-quote">
+        <div class="quote-container">
+            <blockquote>
+                <p>"Art washes away from the soul the dust of everyday life."</p>
+                <cite>— Pablo Picasso</cite>
+            </blockquote>
+        </div>
+    </section>
+
+    <section id="gallery" class="gallery">
+        <h2 class="section-title">Recent Artworks</h2>
+        <div class="section-subtitle">Our latest creative expressions</div>
+        <div class="gallery-grid">
+            <div class="gallery-card">
+                <div class="artwork-image">
+                    <img src="images/painting1.jpg" alt="Abstract Painting">
+                </div>
+                <div class="artwork-details">
+                    <h3>Ethereal Dreams</h3>
+                    <p class="artwork-medium">Acrylic on Canvas, 2025</p>
+                    <a href="artwork-details.html?id=1" class="view-btn"><span>View Details</span><i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="gallery-card">
+                <div class="artwork-image">
+                    <img src="images/painting2.jpg" alt="Landscape Painting">
+                </div>
+                <div class="artwork-details">
+                    <h3>Serene Horizon</h3>
+                    <p class="artwork-medium">Oil on Canvas, 2025</p>
+                    <a href="artwork-details.html?id=2" class="view-btn"><span>View Details</span><i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="gallery-card">
+                <div class="artwork-image">
+                    <img src="images/painting3.jpg" alt="Portrait Painting">
+                </div>
+                <div class="artwork-details">
+                    <h3>Inner Light</h3>
+                    <p class="artwork-medium">Mixed Media, 2025</p>
+                    <a href="artwork-details.html?id=3" class="view-btn"><span>View Details</span><i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="gallery-card">
+                <div class="artwork-image">
+                    <img src="images/painting4.jpg" alt="Abstract Painting">
+                </div>
+                <div class="artwork-details">
+                    <h3>Cosmic Whispers</h3>
+                    <p class="artwork-medium">Acrylic on Canvas, 2025</p>
+                    <a href="artwork-details.html?id=4" class="view-btn"><span>View Details</span><i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="gallery-card">
+                <div class="artwork-image">
+                    <img src="images/painting5.jpg" alt="Nature Painting">
+                </div>
+                <div class="artwork-details">
+                    <h3>Blooming Silence</h3>
+                    <p class="artwork-medium">Watercolor, 2025</p>
+                    <a href="artwork-details.html?id=5" class="view-btn"><span>View Details</span><i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="gallery-card">
+                <div class="artwork-image">
+                    <img src="images/painting6.jpg" alt="Abstract Painting">
+                </div>
+                <div class="artwork-details">
+                    <h3>Vibrant Echoes</h3>
+                    <p class="artwork-medium">Oil on Canvas, 2025</p>
+                    <a href="artwork-details.html?id=6" class="view-btn"><span>View Details</span><i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <a href="all-artworks.html" class="btn view-all fade-in">Explore Full Collection</a>
+    </section>
+
+    <section id="about" class="about">
+        <div class="about-content">
+            <div class="about-image">
+                <img src="images/artist.jpg" alt="Artist Photo">
+            </div>
+            <div class="about-text">
+                <h2 class="section-title">About the Artist</h2>
+                <div class="section-subtitle">The creative mind behind the canvas</div>
+                <p>Welcome to The Color Symphony, a space where art meets storytelling, and emotions come to life through pencil strokes. I'm Manvi, an artist who believes that every drawing holds a story waiting to be told.</p>
+                <p>With just a pencil and imagination, I create worlds filled with depth, nostalgia, and untold emotions. My artwork isn't just about sketches—it's about the narratives woven within them, the whispers of characters, the silent expressions that speak louder than words.</p>
+                <p>Through The Color Symphony, I invite you to step into my artistic realm, where simplicity meets profound storytelling. Every drawing is accompanied by a story—a tale of love, dreams, resilience, or wonder. Whether you're here to admire the details of each sketch or lose yourself in the emotions behind them, I hope you find a connection, a spark, an inspiration.</p>
+                <p>Join me on this journey where pencil strokes bring stories to life, and every illustration is a melody of emotions waiting to be heard.</p>
+                <div class="signature">
+                    <img src="images/signature.png" alt="Artist Signature">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h2>The Color Symphony</h2>
+                <p>Bringing art to life through color and form.</p>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#gallery">Gallery</a></li>
+                    <li><a href="all-artworks.html">All Artworks</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="admin/login.html">Admin</a></li>
+                </ul>
+            </div>
+            <div class="footer-dev">
+                <h3>Developer</h3>
+                <div class="dev-card">
+                    <div class="dev-card-inner">
+                        <div class="dev-card-front">
+                            <div class="dev-avatar">
+                                <img src="images/developer.png" alt="Developer Mittul">
+                            </div>
+                            <h4>Mittul Dall</h4>
+                            <span class="dev-click-hint">Click to Connect <i class="fas fa-hand-pointer"></i></span>
+                        </div>
+                        <div class="dev-card-back">
+                            <div class="dev-social-links">
+                                <a href="https://devmittul.github.io/myintro/" target="_blank" rel="noopener" aria-label="Portfolio"><i class="fas fa-globe"></i></a>
+                                <a href="https://www.linkedin.com/in/immittul?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                                <a href="mailto:devmittul@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                            </div>
+                            <p>Self-made Developer passionate about blending creativity with functionality.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 The Color Symphony. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Ensure the view all button and footer are visible
+        document.addEventListener("DOMContentLoaded", function() {
+            // Force view all button to be visible
+            const viewAllBtn = document.querySelector('.view-all');
+            if (viewAllBtn) {
+                viewAllBtn.style.opacity = '1';
+                viewAllBtn.style.visibility = 'visible';
+            }
+            
+            // Force footer to be visible
+            const footer = document.querySelector('footer');
+            if (footer) {
+                footer.style.opacity = '1';
+                footer.style.visibility = 'visible';
+            }
+            
+            // Run animations immediately
+            setTimeout(function() {
+                const sections = document.querySelectorAll('.gallery, .about, footer');
+                sections.forEach(section => {
+                    section.classList.add('in-view');
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html> 

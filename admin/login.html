@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Color Symphony</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBeM-N2EhqwL593MNn7ZW-S0OWvMgDToRs",
+            authDomain: "thecoloursymphony.firebaseapp.com",
+            projectId: "thecoloursymphony",
+            storageBucket: "thecoloursymphony.appspot.com",
+            messagingSenderId: "1075361168499",
+            appId: "1:1075361168499:web:35ee7ac9dd5f1c0aaac200"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            background-image: linear-gradient(135deg, #f5f5f5 0%, #e8e1d5 100%);
+        }
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #8d7b68;
+            font-size: 1.8rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #8d7b68;
+            box-shadow: 0 0 0 3px rgba(141, 123, 104, 0.1);
+        }
+        button {
+            width: 100%;
+            padding: 0.9rem;
+            background-color: #8d7b68;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 500;
+        }
+        button:hover {
+            background-color: #a4907c;
+        }
+        .error {
+            color: #dc3545;
+            margin-top: 1rem;
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: rgba(220, 53, 69, 0.1);
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .demo-login {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            padding: 0.75rem;
+            background-color: #f9f7f5;
+            border-radius: 8px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .logo img {
+            max-width: 100%;
+            height: 60px;
+        }
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1.5rem;
+                margin: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h2>The Color Symphony</h2>
+        </div>
+        <h1>Admin Login</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required autocomplete="current-password">
+            </div>
+            <button type="submit" id="loginButton">Login</button>
+            <div id="error" class="error"></div>
+            <div class="demo-login">
+                Demo credentials: admin@example.com / password
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Clear any existing session/redirect flags
+        sessionStorage.removeItem('redirect_to_login');
+        sessionStorage.removeItem('auth_checked');
+        
+        const loginForm = document.getElementById('loginForm');
+        const loginButton = document.getElementById('loginButton');
+        const errorElement = document.getElementById('error');
+        
+        function showError(message) {
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+        
+        function hideError() {
+            errorElement.textContent = '';
+            errorElement.classList.remove('show');
+        }
+        
+        // Simple login function with Firebase Auth support
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            loginButton.disabled = true;
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Clear previous errors
+            hideError();
+            
+            // Try Firebase authentication first
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Signed in
+                        localStorage.setItem('adminLoggedIn', 'true');
+                        window.location.href = 'manage-artworks.html';
+                    })
+                    .catch((error) => {
+                        // Fall back to demo login if Firebase auth fails
+                        if (email === 'admin@example.com' && password === 'password') {
+                            localStorage.setItem('adminLoggedIn', 'true');
+                            window.location.href = 'manage-artworks.html';
+                        } else {
+                            showError('Invalid email or password');
+                            loginButton.innerHTML = 'Login';
+                            loginButton.disabled = false;
+                        }
+                    });
+            } else {
+                // Demo login fallback when Firebase is not available
+                if (email === 'admin@example.com' && password === 'password') {
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    window.location.href = 'manage-artworks.html';
+                } else {
+                    showError('Invalid email or password');
+                    loginButton.innerHTML = 'Login';
+                    loginButton.disabled = false;
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
