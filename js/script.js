@@ -187,117 +187,139 @@ artworkImages.forEach(img => {
     });
 });
 
-// Load and display artworks from the admin panel
-function loadAndDisplayArtworks() {
+// Load and display artworks from the database system
+async function loadAndDisplayArtworks() {
     const artworksContainer = document.querySelector('.gallery-container');
     if (!artworksContainer) return;
 
-    // Load artworks from localStorage
-    let artworks = [];
-    const storedArtworks = localStorage.getItem('artworks');
-    
-    if (storedArtworks) {
-        try {
-            artworks = JSON.parse(storedArtworks);
-            console.log('Loaded artworks from localStorage:', artworks.length);
-        } catch (error) {
-            console.error("Error parsing artworks:", error);
-        }
-    }
-    
-    // Create sample artworks if none exist
-    if (artworks.length === 0) {
-        console.log('No artworks found, creating samples');
-        const sampleArtworks = [
-            {
-                id: 1,
-                title: "Sunrise over Mountains",
-                artist: "Emily Johnson",
-                year: "2022",
-                medium: "Oil on Canvas",
-                dimensions: "24 x 36 inches",
-                description: "A vibrant depiction of sunrise illuminating a mountain range.",
-                featured: true,
-                images: [
-                    { path: "images/painting1.jpg", isPrimary: true }
-                ]
-            },
-            {
-                id: 2,
-                title: "Ocean Waves at Sunset",
-                artist: "Michael Chen",
-                year: "2023",
-                medium: "Acrylic",
-                dimensions: "18 x 24 inches",
-                description: "Powerful ocean waves crashing against rocks at sunset.",
-                featured: false,
-                images: [
-                    { path: "images/painting2.jpg", isPrimary: true }
-                ]
-            }
-        ];
+    // Show a loading state
+    artworksContainer.innerHTML = '<div class="loading-artworks"><i class="fas fa-spinner fa-spin"></i><p>Loading artwork collection...</p></div>';
+
+    try {
+        // Load artworks using the database utilities if available
+        let artworks = [];
         
-        // Save sample artworks to localStorage
-        localStorage.setItem('artworks', JSON.stringify(sampleArtworks));
-        artworks = sampleArtworks;
-    }
-    
-    // Clear container first
-    artworksContainer.innerHTML = '';
-    
-    // Sort artworks - featured first, then by date
-    artworks.sort((a, b) => {
-        if (a.featured && !b.featured) return -1;
-        if (!a.featured && b.featured) return 1;
-        return 0;
-    });
-    
-    // Display artworks
-    artworks.forEach(artwork => {
-        // Create artwork element
-        const artworkElement = document.createElement('div');
-        artworkElement.className = 'gallery-item fade-in';
-        artworkElement.dataset.artworkId = artwork.id; // Add ID to DOM element for easy updating
-        
-        // Get image path, ensuring it works for both admin and main site paths
-        let imagePath = '';
-        if (artwork.images && artwork.images.length > 0) {
-            imagePath = artwork.images[0].path;
-            
-            // Handle paths that might have been set in admin panel
-            if (imagePath.startsWith('../images/')) {
-                imagePath = imagePath.replace('../images/', 'images/');
-            } else if (!imagePath.includes('/')) {
-                imagePath = 'images/' + imagePath;
-            }
+        if (window.dbUtils) {
+            // Use the database system
+            console.log('Using database system to load artworks');
+            artworks = await window.dbUtils.loadArtworks();
         } else {
-            imagePath = 'images/placeholder.jpg';
+            // Fallback to the old localStorage method
+            console.log('Falling back to localStorage for artworks');
+            const storedArtworks = localStorage.getItem('artworks');
+            
+            if (storedArtworks) {
+                try {
+                    artworks = JSON.parse(storedArtworks);
+                    console.log('Loaded artworks from localStorage:', artworks.length);
+                } catch (error) {
+                    console.error("Error parsing artworks:", error);
+                }
+            }
+            
+            // Create sample artworks if none exist
+            if (artworks.length === 0) {
+                console.log('No artworks found, creating samples');
+                const sampleArtworks = [
+                    {
+                        id: 1,
+                        title: "Sunrise over Mountains",
+                        artist: "Emily Johnson",
+                        year: "2022",
+                        medium: "Oil on Canvas",
+                        dimensions: "24 x 36 inches",
+                        description: "A vibrant depiction of sunrise illuminating a mountain range.",
+                        featured: true,
+                        images: [
+                            { path: "images/painting1.jpg", isPrimary: true }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Ocean Waves at Sunset",
+                        artist: "Michael Chen",
+                        year: "2023",
+                        medium: "Acrylic",
+                        dimensions: "18 x 24 inches",
+                        description: "Powerful ocean waves crashing against rocks at sunset.",
+                        featured: false,
+                        images: [
+                            { path: "images/painting2.jpg", isPrimary: true }
+                        ]
+                    }
+                ];
+                
+                // Save sample artworks to localStorage
+                localStorage.setItem('artworks', JSON.stringify(sampleArtworks));
+                artworks = sampleArtworks;
+            }
         }
         
-        // Create HTML content
-        artworkElement.innerHTML = `
-            <div class="gallery-image">
-                <img src="${imagePath}" alt="${artwork.title}" loading="lazy">
-            </div>
-            <div class="gallery-info">
-                <h3>${artwork.title}</h3>
-                <p>${artwork.medium}, ${artwork.year}</p>
-                <button class="view-details" data-id="${artwork.id}">View Details</button>
+        // Clear container
+        artworksContainer.innerHTML = '';
+        
+        // Sort artworks - featured first, then by date
+        artworks.sort((a, b) => {
+            if (a.featured && !b.featured) return -1;
+            if (!a.featured && b.featured) return 1;
+            return 0;
+        });
+        
+        // Display artworks
+        artworks.forEach(artwork => {
+            // Create artwork element
+            const artworkElement = document.createElement('div');
+            artworkElement.className = 'gallery-item fade-in';
+            artworkElement.dataset.artworkId = artwork.id; // Add ID to DOM element for easy updating
+            
+            // Get image path, ensuring it works for both admin and main site paths
+            let imagePath = '';
+            if (artwork.images && artwork.images.length > 0) {
+                imagePath = artwork.images[0].path;
+                
+                // Handle paths that might have been set in admin panel
+                if (imagePath.startsWith('../images/')) {
+                    imagePath = imagePath.replace('../images/', 'images/');
+                } else if (!imagePath.includes('/')) {
+                    imagePath = 'images/' + imagePath;
+                }
+            } else {
+                imagePath = 'images/placeholder.jpg';
+            }
+            
+            // Create HTML content
+            artworkElement.innerHTML = `
+                <div class="gallery-image">
+                    <img src="${imagePath}" alt="${artwork.title}" loading="lazy">
+                </div>
+                <div class="gallery-info">
+                    <h3>${artwork.title}</h3>
+                    <p>${artwork.medium}, ${artwork.year}</p>
+                    <button class="view-details" data-id="${artwork.id}">View Details</button>
+                </div>
+            `;
+            
+            // Add to container
+            artworksContainer.appendChild(artworkElement);
+            
+            // Add click event for artwork details
+            const viewDetailsBtn = artworkElement.querySelector('.view-details');
+            viewDetailsBtn.addEventListener('click', () => {
+                openArtworkModal(artwork);
+            });
+        });
+        
+        // Store timestamp of last load to detect changes
+        localStorage.setItem('lastArtworkLoadTime', Date.now().toString());
+    } catch (error) {
+        console.error('Error loading artworks:', error);
+        artworksContainer.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Sorry, we couldn't load the artwork collection. Please try again later.</p>
             </div>
         `;
-        
-        // Add to container
-        artworksContainer.appendChild(artworkElement);
-        
-        // Add click event for artwork details
-        const viewDetailsBtn = artworkElement.querySelector('.view-details');
-        viewDetailsBtn.addEventListener('click', () => {
-            openArtworkModal(artwork);
-        });
-    });
-    
-    // Store timestamp of last load to detect changes
-    localStorage.setItem('lastArtworkLoadTime', Date.now().toString());
+    }
 }
 
 // Function to check if artworks have been updated in localStorage
@@ -608,4 +630,38 @@ document.addEventListener('DOMContentLoaded', () => {
         footer.style.visibility = 'visible';
         footer.classList.add('in-view');
     }
-}); 
+});
+
+// Function to add CSS styles to the page
+function addGalleryStyles() {
+    // Create a style element
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `
+        .loading-artworks, .error-message {
+            text-align: center;
+            padding: 40px 20px;
+            width: 100%;
+        }
+        
+        .loading-artworks i, .error-message i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #8d7b68;
+        }
+        
+        .error-message i {
+            color: #dc3545;
+        }
+        
+        .loading-artworks p, .error-message p {
+            color: #666;
+            margin: 0;
+        }
+    `;
+    
+    // Add to document head
+    document.head.appendChild(styleEl);
+}
+
+// Call this function when the document is loaded
+document.addEventListener('DOMContentLoaded', addGalleryStyles); 

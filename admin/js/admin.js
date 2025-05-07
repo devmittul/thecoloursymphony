@@ -434,10 +434,21 @@ function setupArtworkForm() {
             
             // Add the new artwork to the local storage
             artworks.push(newArtwork);
-            localStorage.setItem('artworks', JSON.stringify(artworks));
+            
+            // Save artwork data using database utilities if available
+            if (window.dbUtils) {
+                window.dbUtils.saveArtworks(artworks);
+                console.log('Artwork saved using database utilities');
+            } else {
+                // Fallback to localStorage only
+                localStorage.setItem('artworks', JSON.stringify(artworks));
+            }
             
             // Set timestamp to indicate update
             localStorage.setItem('artworksLastUpdated', Date.now().toString());
+            
+            // Set flag to indicate data needs publishing to GitHub
+            localStorage.setItem('artworksNeedPublishing', 'true');
             
             // Dispatch custom event for any listeners
             if (typeof window.parent !== 'undefined') {
@@ -446,7 +457,7 @@ function setupArtworkForm() {
             }
             
             // Show success message
-            showAlert('Artwork saved successfully! It will now appear on the website.', 'success');
+            showAlert('Artwork saved successfully! Remember to publish your changes.', 'success');
             
             // Reset form and UI
             artworkForm.reset();
@@ -527,15 +538,36 @@ function setupArtworkForm() {
 
 // Load artworks from localStorage
 function loadArtworks() {
-    // Load from localStorage
-    const storedArtworks = localStorage.getItem('artworks');
-    
-    if (storedArtworks) {
-        artworks = JSON.parse(storedArtworks);
+    // Try to load using database utilities if available
+    if (window.dbUtils) {
+        console.log('Using database utilities to load artworks');
+        window.dbUtils.loadArtworks()
+            .then(loadedArtworks => {
+                artworks = loadedArtworks;
+                console.log('Artworks loaded from database:', artworks.length);
+            })
+            .catch(error => {
+                console.error('Error loading artworks from database:', error);
+                // Fallback to localStorage
+                fallbackToLocalStorage();
+            });
     } else {
-        // Initialize with empty array if no artworks exist
-        artworks = [];
-        localStorage.setItem('artworks', JSON.stringify(artworks));
+        // Fallback to the original localStorage method
+        fallbackToLocalStorage();
+    }
+    
+    // Helper function for localStorage fallback
+    function fallbackToLocalStorage() {
+        // Load from localStorage
+        const storedArtworks = localStorage.getItem('artworks');
+        
+        if (storedArtworks) {
+            artworks = JSON.parse(storedArtworks);
+        } else {
+            // Initialize with empty array if no artworks exist
+            artworks = [];
+            localStorage.setItem('artworks', JSON.stringify(artworks));
+        }
     }
 }
 

@@ -14,6 +14,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     
+    <!-- Database Utilities -->
+    <script src="../js/db-utils.js"></script>
+    
     <!-- Firebase Configuration -->
     <script>
         // Your web app's Firebase configuration
@@ -558,6 +561,63 @@
         .remove-samples-btn:hover {
             background-color: #f5c6cb;
         }
+        
+        .github-btn {
+            background-color: #24292e;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+            flex: 1;
+            justify-content: center;
+            min-width: 200px;
+        }
+        
+        .github-btn:hover {
+            background-color: #3a3f46;
+        }
+        
+        /* Status indicator styles */
+        .github-status {
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .github-status i {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .github-status.needs-publish {
+            background-color: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        
+        .github-status.needs-publish i {
+            color: #ffc107;
+        }
+        
+        .github-status.up-to-date {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+        }
+        
+        .github-status.up-to-date i {
+            color: #28a745;
+        }
     </style>
 </head>
 <body>
@@ -595,6 +655,12 @@
         <!-- Main Content -->
         <div class="admin-main">
             <div class="admin-content">
+                <!-- Status indicator for unpublished changes -->
+                <div id="githubStatus" class="github-status">
+                    <i class="fas fa-circle-info"></i>
+                    <span>Checking for unpublished changes...</span>
+                </div>
+                
                 <!-- Search and filters -->
                 <div class="search-box">
                     <input type="text" id="searchInput" class="search-input" placeholder="Search artworks...">
@@ -614,6 +680,9 @@
                     </button>
                     <button id="removeSamplesBtn" class="remove-samples-btn">
                         <i class="fas fa-trash-alt"></i> Remove Sample Artworks
+                    </button>
+                    <button id="exportToGitHubBtn" class="github-btn">
+                        <i class="fab fa-github"></i> Export Data for GitHub
                     </button>
                 </div>
                 
@@ -679,6 +748,9 @@
             
             // Set up event listeners
             setupEventListeners();
+            
+            // Check if there are unpublished changes
+            updateGitHubStatusIndicator();
         });
         
         // Initialize mobile menu
@@ -995,6 +1067,9 @@
             
             // Remove Sample Artworks button
             document.getElementById('removeSamplesBtn').addEventListener('click', removeSampleArtworks);
+            
+            // Export to GitHub button
+            document.getElementById('exportToGitHubBtn').addEventListener('click', handleGitHubExport);
         }
         
         // Handle search
@@ -1122,6 +1197,82 @@
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
+        }
+        
+        // Function to handle GitHub export
+        function handleGitHubExport() {
+            try {
+                // Use the database utilities to export data
+                window.dbUtils.exportArtworkData();
+                
+                // Show instructions in a modal
+                const instructionsModal = document.createElement('div');
+                instructionsModal.className = 'modal active';
+                instructionsModal.id = 'githubInstructionsModal';
+                
+                instructionsModal.innerHTML = `
+                    <div class="modal-content" style="max-width: 600px;">
+                        <div class="modal-header">
+                            <h2 class="modal-title">Upload to GitHub</h2>
+                            <button class="modal-close" id="closeInstructionsModal" aria-label="Close">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p>You have exported your artwork data to a JSON file. Follow these steps to update your GitHub repository:</p>
+                            <ol style="text-align: left; padding-left: 20px;">
+                                <li>Go to your GitHub repository at <a href="https://github.com/${DB_CONFIG.owner}/${DB_CONFIG.repo}" target="_blank">github.com/${DB_CONFIG.owner}/${DB_CONFIG.repo}</a></li>
+                                <li>Navigate to the <code>data</code> folder</li>
+                                <li>Click on <code>artworks.json</code></li>
+                                <li>Click the pencil icon to edit the file</li>
+                                <li>Delete all content in the file</li>
+                                <li>Open the downloaded <code>artworks.json</code> file on your computer with a text editor</li>
+                                <li>Copy all content and paste it into the GitHub editor</li>
+                                <li>Scroll down and click <strong>Commit changes</strong></li>
+                            </ol>
+                            <p>Your website will now load artwork data directly from this JSON file.</p>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-primary" id="confirmInstructions">Got it!</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(instructionsModal);
+                
+                // Set up close handlers
+                document.getElementById('closeInstructionsModal').addEventListener('click', () => {
+                    instructionsModal.remove();
+                });
+                
+                document.getElementById('confirmInstructions').addEventListener('click', () => {
+                    instructionsModal.remove();
+                });
+                
+                // Show success message
+                showToast('Artwork data exported successfully!', 'success');
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showToast('Error exporting data: ' + error.message, 'error');
+            }
+        }
+        
+        // Update the GitHub status indicator
+        function updateGitHubStatusIndicator() {
+            const statusEl = document.getElementById('githubStatus');
+            const needsPublishing = localStorage.getItem('artworksNeedPublishing') === 'true';
+            
+            if (needsPublishing) {
+                statusEl.className = 'github-status needs-publish';
+                statusEl.innerHTML = `
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>You have unpublished changes that need to be exported to GitHub. Use the <strong>Export Data for GitHub</strong> button to update your repository.</span>
+                `;
+            } else {
+                statusEl.className = 'github-status up-to-date';
+                statusEl.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <span>Your artwork data is up to date with GitHub.</span>
+                `;
+            }
         }
     </script>
 </body>

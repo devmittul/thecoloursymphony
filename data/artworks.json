@@ -1,0 +1,33 @@
+{
+  "artworks": [
+    {
+      "id": "1000001",
+      "title": "Sunrise over Mountains",
+      "artist": "Emily Johnson",
+      "year": "2022",
+      "medium": "Oil on Canvas",
+      "dimensions": "24 x 36 inches",
+      "description": "A vibrant depiction of sunrise illuminating a mountain range.",
+      "dateAdded": "2023-11-15",
+      "featured": true,
+      "images": [
+        { "path": "images/painting1.jpg", "isPrimary": true }
+      ]
+    },
+    {
+      "id": "1000002",
+      "title": "Ocean Waves at Sunset",
+      "artist": "Michael Chen",
+      "year": "2023",
+      "medium": "Acrylic",
+      "dimensions": "18 x 24 inches",
+      "description": "Powerful ocean waves crashing against rocks at sunset.",
+      "dateAdded": "2023-12-10",
+      "featured": false,
+      "images": [
+        { "path": "images/painting2.jpg", "isPrimary": true }
+      ]
+    }
+  ],
+  "lastUpdated": "2023-12-30T12:00:00Z"
+} 
