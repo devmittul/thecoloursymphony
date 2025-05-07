@@ -99,6 +99,7 @@
         <button id="createSampleArtworks" class="debug-btn">Create Sample Artworks</button>
         <button id="setLoggedIn" class="debug-btn">Set Admin Logged In</button>
         <button id="clearArtworks" class="debug-btn danger">Clear Artworks</button>
+        <button id="fixFirebaseIssues" class="debug-btn">Fix Firebase Issues</button>
         <a href="manage-artworks.html" class="debug-btn secondary">Go to Manage Artworks</a>
         <a href="login.html" class="debug-btn secondary">Go to Login</a>
     </div>
@@ -132,7 +133,7 @@
             document.getElementById('localStorageKeys').textContent = keys.join('\n');
         }
         
-        // Create sample artworks
+        // Create sample artworks with working file paths
         function createSampleArtworks() {
             const sampleArtworks = [
                 {
@@ -145,7 +146,7 @@
                     featured: true,
                     images: [
                         {
-                            path: "../images/placeholder.jpg",
+                            path: "../images/painting1.jpg",
                             isPrimary: true
                         }
                     ]
@@ -160,7 +161,7 @@
                     featured: false,
                     images: [
                         {
-                            path: "../images/placeholder.jpg",
+                            path: "../images/painting2.jpg",
                             isPrimary: true
                         }
                     ]
@@ -168,7 +169,7 @@
             ];
             
             localStorage.setItem('artworks', JSON.stringify(sampleArtworks));
-            alert('Sample artworks created successfully!');
+            alert('Sample artworks created successfully with valid image paths!');
             loadLocalStorageData();
         }
         
@@ -188,6 +189,62 @@
             }
         }
         
+        // Fix common Firebase issues
+        function fixFirebaseIssues() {
+            try {
+                // Check if Firebase is available
+                if (typeof firebase === 'undefined') {
+                    alert('Firebase SDK is not loaded. This is expected if using localStorage fallback.');
+                    return;
+                }
+                
+                // Initialize Firebase if not already initialized
+                if (!firebase.apps.length) {
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyBeM-N2EhqwL593MNn7ZW-S0OWvMgDToRs",
+                        authDomain: "thecoloursymphony.firebaseapp.com",
+                        projectId: "thecoloursymphony",
+                        storageBucket: "thecoloursymphony.appspot.com",
+                        messagingSenderId: "1075361168499",
+                        appId: "1:1075361168499:web:35ee7ac9dd5f1c0aaac200"
+                    };
+                    
+                    firebase.initializeApp(firebaseConfig);
+                    alert('Firebase successfully initialized!');
+                } else {
+                    alert('Firebase is already initialized.');
+                }
+                
+                // Check if artworks in localStorage have proper image paths
+                const artworksData = localStorage.getItem('artworks');
+                if (artworksData) {
+                    const artworks = JSON.parse(artworksData);
+                    let fixedArtworks = false;
+                    
+                    artworks.forEach(artwork => {
+                        if (artwork.images && artwork.images.length > 0) {
+                            // Fix image paths that start with "uploading:"
+                            if (artwork.images[0].path.startsWith('uploading:')) {
+                                const filename = artwork.images[0].path.split('uploading:')[1];
+                                artwork.images[0].path = `../images/${filename}`;
+                                fixedArtworks = true;
+                            }
+                        }
+                    });
+                    
+                    if (fixedArtworks) {
+                        localStorage.setItem('artworks', JSON.stringify(artworks));
+                        alert('Fixed artwork image paths in localStorage.');
+                    } else {
+                        alert('No artwork image paths needed fixing.');
+                    }
+                }
+            } catch (error) {
+                alert('Error fixing Firebase issues: ' + error.message);
+                console.error('Firebase fix error:', error);
+            }
+        }
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Load data
@@ -197,6 +254,7 @@
             document.getElementById('createSampleArtworks').addEventListener('click', createSampleArtworks);
             document.getElementById('setLoggedIn').addEventListener('click', setAdminLoggedIn);
             document.getElementById('clearArtworks').addEventListener('click', clearArtworks);
+            document.getElementById('fixFirebaseIssues').addEventListener('click', fixFirebaseIssues);
         });
     </script>
 </body>

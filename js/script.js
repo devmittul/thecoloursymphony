@@ -174,6 +174,9 @@ window.addEventListener('scroll', animateOnScroll);
 window.addEventListener('load', () => {
     // Small delay to ensure everything is loaded
     setTimeout(animateOnScroll, 300);
+    
+    // Load and display artworks from localStorage
+    loadAndDisplayArtworks();
 });
 
 // Image loading animation

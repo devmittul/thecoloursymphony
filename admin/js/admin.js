@@ -454,26 +454,35 @@ function setupArtworkForm() {
         // If we're using Firebase and have an image to upload
         if (firebaseStorage && imagePreview.file) {
             // Upload to Firebase Storage
-            const metadata = {
-                contentType: imagePreview.file.type
-            };
-            
-            // Generate a unique filename
-            const filename = `artwork_${formData.id}_${imagePreview.file.name}`;
-            const artworkImagesRef = storageRef.child(`artworks/${filename}`);
-            
-            artworkImagesRef.put(imagePreview.file, metadata)
-                .then(snapshot => snapshot.ref.getDownloadURL())
-                .then(downloadURL => {
-                    // Save artwork with Firebase Storage URL
-                    saveArtworkData(downloadURL);
-                })
-                .catch(error => {
-                    console.error('Upload failed:', error);
-                    showAlert('Failed to upload image. Please try again.', 'error');
-                    submitButton.innerHTML = originalText;
-                    submitButton.disabled = false;
-                });
+            try {
+                const metadata = {
+                    contentType: imagePreview.file.type
+                };
+                
+                // Generate a unique filename
+                const filename = `artwork_${formData.id}_${imagePreview.file.name}`;
+                const artworkImagesRef = storageRef.child(`artworks/${filename}`);
+                
+                artworkImagesRef.put(imagePreview.file, metadata)
+                    .then(snapshot => snapshot.ref.getDownloadURL())
+                    .then(downloadURL => {
+                        // Save artwork with Firebase Storage URL
+                        saveArtworkData(downloadURL);
+                    })
+                    .catch(error => {
+                        console.error('Firebase upload failed:', error);
+                        // Save anyway with local path as fallback
+                        showAlert('Could not upload to Firebase. Saving with local image path instead.', 'info');
+                        const fallbackPath = `../images/${imagePreview.file.name}`;
+                        saveArtworkData(fallbackPath);
+                    });
+            } catch (error) {
+                console.error('Firebase error:', error);
+                // Fallback to local save
+                showAlert('Firebase error occurred. Saving with local image path instead.', 'info');
+                const fallbackPath = `../images/${imagePreview.file.name}`;
+                saveArtworkData(fallbackPath);
+            }
         } else {
             // Fallback to local save without Firebase
             setTimeout(() => {
